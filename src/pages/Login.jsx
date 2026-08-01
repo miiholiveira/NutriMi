@@ -1,0 +1,152 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authClient } from '../lib/auth';
+
+const FEATURES = [
+  { icon: '🥗', label: 'Planos alimentares personalizados' },
+  { icon: '👥', label: 'Gestão completa de pacientes' },
+  { icon: '📅', label: 'Agendamento de consultas' },
+  { icon: '📊', label: 'Relatórios nutricionais' },
+];
+
+export default function Login({ onSuccess }) {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErro('');
+
+    if (!email.trim() || !senha.trim()) {
+      setErro('Por favor, preencha o e-mail e a senha.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await authClient.signIn.email({
+        email: email.trim().toLowerCase(),
+        password: senha,
+      });
+
+      if (result.error) {
+        const msg = result.error.message || '';
+        if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credential')) {
+          setErro('E-mail ou senha incorretos. Verifique seus dados e tente novamente.');
+        } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('user')) {
+          setErro('Conta não encontrada. Verifique o e-mail ou crie uma conta.');
+        } else {
+          setErro('Não foi possível fazer o login. Tente novamente em instantes.');
+        }
+        return;
+      }
+
+      onSuccess(result.data?.session ?? result.data);
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('Login error:', err);
+      setErro('Ocorreu um erro inesperado. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      {/* Painel esquerdo */}
+      <div className="auth-panel">
+        <div className="auth-panel-content">
+          <img src="/logo.png" alt="NutriMi logo" style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: 16, background: 'rgba(255,255,255,0.15)', padding: 12 }} />
+          <p className="tagline">Nutrição inteligente,<br />cuidado personalizado</p>
+          <p className="subtitle">Tudo que você precisa para gerenciar seus pacientes em um só lugar.</p>
+        </div>
+
+        <div className="auth-panel-features">
+          {FEATURES.map((f) => (
+            <div className="auth-feature-item" key={f.label}>
+              <div className="feature-icon">{f.icon}</div>
+              <span>{f.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Painel direito — formulário */}
+      <div className="auth-form-panel">
+        <div className="auth-form-wrapper">
+          {/* Logo */}
+          <div className="auth-logo">
+            <img src="/logo.png" alt="NutriMi" className="auth-logo-img" />
+            <span className="auth-logo-text">NutriMi</span>
+          </div>
+
+          {/* Cabeçalho */}
+          <div className="auth-form-header">
+            <h1>Bem-vinda de volta!</h1>
+            <p>Acesse sua conta para continuar</p>
+          </div>
+
+          {/* Erro */}
+          {erro && (
+            <div className="alert alert-error" role="alert" style={{ marginBottom: '1rem' }}>
+              <span>⚠️</span>
+              <span>{erro}</span>
+            </div>
+          )}
+
+          {/* Formulário */}
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            <div className="form-group">
+              <label className="form-label" htmlFor="login-email">E-mail</label>
+              <input
+                id="login-email"
+                type="email"
+                className={`form-input${erro ? ' error' : ''}`}
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setErro(''); }}
+                autoComplete="email"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="login-senha">Senha</label>
+              <input
+                id="login-senha"
+                type="password"
+                className={`form-input${erro ? ' error' : ''}`}
+                placeholder="Sua senha"
+                value={senha}
+                onChange={(e) => { setSenha(e.target.value); setErro(''); }}
+                autoComplete="current-password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              id="login-submit"
+            >
+              {loading ? (
+                <><span className="spinner" />Entrando...</>
+              ) : (
+                <span>Entrar</span>
+              )}
+            </button>
+          </form>
+
+          <div className="auth-switch">
+            Não tem conta?{' '}
+            <Link to="/cadastro">Cadastre-se gratuitamente</Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
