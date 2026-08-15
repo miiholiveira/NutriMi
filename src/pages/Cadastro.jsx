@@ -49,13 +49,24 @@ export default function Cadastro({ onSuccess }) {
       });
 
       if (result.error) {
-        const msg = result.error.message || '';
-        if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('exist')) {
-          setErro('Este e-mail já está cadastrado. Faça login ou use outro e-mail.');
-        } else if (msg.toLowerCase().includes('password')) {
+        console.error('Signup error:', result.error);
+        const errObj = result.error || {};
+        const msg = String(errObj.message || errObj.statusText || '').toLowerCase();
+        const code = String(errObj.code || '').toLowerCase();
+
+        if (
+          code.includes('already') ||
+          code.includes('exist') ||
+          msg.includes('already') ||
+          msg.includes('exist') ||
+          msg.includes('cadastrado') ||
+          msg.includes('user_already_exists')
+        ) {
+          setErro('Este e-mail já está cadastrado. Faça login ou clique abaixo para entrar.');
+        } else if (msg.includes('password') || code.includes('password')) {
           setErro('A senha não atende aos requisitos. Use pelo menos 6 caracteres.');
         } else {
-          setErro('Não foi possível criar sua conta. Tente novamente em instantes.');
+          setErro(errObj.message || 'Não foi possível criar sua conta. Tente novamente em instantes.');
         }
         return;
       }

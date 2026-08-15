@@ -33,13 +33,17 @@ export default function Login({ onSuccess }) {
       });
 
       if (result.error) {
-        const msg = result.error.message || '';
-        if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credential')) {
+        console.error('Login error:', result.error);
+        const errObj = result.error || {};
+        const msg = String(errObj.message || errObj.statusText || '').toLowerCase();
+        const code = String(errObj.code || '').toLowerCase();
+
+        if (msg.includes('invalid') || msg.includes('credential') || code.includes('invalid') || code.includes('credential')) {
           setErro('E-mail ou senha incorretos. Verifique seus dados e tente novamente.');
-        } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('user')) {
+        } else if (msg.includes('not found') || msg.includes('user') || code.includes('not_found')) {
           setErro('Conta não encontrada. Verifique o e-mail ou crie uma conta.');
         } else {
-          setErro('Não foi possível fazer o login. Tente novamente em instantes.');
+          setErro(errObj.message || 'Não foi possível fazer o login. Tente novamente em instantes.');
         }
         return;
       }

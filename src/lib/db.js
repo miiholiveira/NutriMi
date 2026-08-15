@@ -2,7 +2,8 @@ import { neon } from '@neondatabase/serverless';
 
 // Helper local para criar a conexão neon com o timezone configurado
 function getDb() {
-  return neon(import.meta.env.VITE_DATABASE_URL);
+  const url = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DATABASE_URL) || (typeof process !== 'undefined' && process.env?.VITE_DATABASE_URL);
+  return neon(url);
 }
 
 /**
