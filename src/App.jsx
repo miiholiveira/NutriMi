@@ -4,6 +4,7 @@ import { authClient } from './lib/auth';
 import { getNutricionistaByEmail, saveNutricionista } from './lib/db';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
+import ResetSenha from './pages/ResetSenha';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
 import Pacientes from './pages/Pacientes';
@@ -119,13 +120,21 @@ export default function App() {
           </PublicGuard>
         }
       />
+      <Route
+        path="/reset-senha"
+        element={
+          <PublicGuard session={session} loading={loading}>
+            <ResetSenha />
+          </PublicGuard>
+        }
+      />
       
       {/* Rotas protegidas sob Layout */}
       <Route
         path="/dashboard/*"
         element={
           <AuthGuard session={session} loading={loading}>
-            <DashboardLayout session={session} onLogout={handleLogout}>
+            <DashboardLayout session={session} nutricionista={nutricionista} onLogout={handleLogout}>
               <Routes>
                 <Route index element={<DashboardHome session={session} nutricionista={nutricionista} />} />
                 <Route path="pacientes" element={<Pacientes nutricionista={nutricionista} />} />

@@ -21,15 +21,27 @@ async function runWithTimezone(queryFn) {
 }
 
 /**
+ * Retorna o título de tratamento ("Dr." ou "Dra.") do nutricionista
+ */
+export function getTituloNutricionista(nutricionista) {
+  if (!nutricionista) return 'Dra.';
+  const gen = String(nutricionista.genero || '').toLowerCase();
+  if (gen.includes('masc') || gen === 'dr.' || gen === 'dr' || gen === 'm') {
+    return 'Dr.';
+  }
+  return 'Dra.';
+}
+
+/**
  * Salva/atualiza a nutricionista na tabela `nutricionistas`
  */
-export async function saveNutricionista(nome, email) {
+export async function saveNutricionista(nome, email, genero = 'Feminino') {
   try {
     await runWithTimezone(async (sql) => {
       await sql`
-        INSERT INTO nutricionistas (nome, email)
-        VALUES (${nome}, ${email})
-        ON CONFLICT (email) DO UPDATE SET nome = EXCLUDED.nome
+        INSERT INTO nutricionistas (nome, email, genero)
+        VALUES (${nome}, ${email}, ${genero})
+        ON CONFLICT (email) DO UPDATE SET nome = EXCLUDED.nome, genero = EXCLUDED.genero
       `;
     });
   } catch (err) {
@@ -44,7 +56,7 @@ export async function getNutricionistaByEmail(email) {
   try {
     const sql = getDb();
     const rows = await sql`
-      SELECT id, nome, email FROM nutricionistas WHERE email = ${email} LIMIT 1
+      SELECT id, nome, email, genero FROM nutricionistas WHERE email = ${email} LIMIT 1
     `;
     return rows[0] || null;
   } catch (err) {
@@ -59,7 +71,7 @@ export async function getNutricionistaByEmail(email) {
 export async function getNutricionistas() {
   try {
     const sql = getDb();
-    return await sql`SELECT id, nome, email, created_at FROM nutricionistas ORDER BY nome ASC`;
+    return await sql`SELECT id, nome, email, genero, created_at FROM nutricionistas ORDER BY nome ASC`;
   } catch (err) {
     console.error('Erro ao listar nutricionistas:', err);
     return [];

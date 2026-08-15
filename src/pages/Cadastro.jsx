@@ -6,6 +6,7 @@ import { saveNutricionista } from '../lib/db';
 export default function Cadastro({ onSuccess }) {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
+  const [genero, setGenero] = useState('Feminino');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
@@ -73,7 +74,7 @@ export default function Cadastro({ onSuccess }) {
 
       // Salvar nutricionista na tabela pública (não-bloqueante)
       try {
-        await saveNutricionista(nome.trim(), email.trim().toLowerCase());
+        await saveNutricionista(nome.trim(), email.trim().toLowerCase(), genero);
       } catch {
         // Falha silenciosa — o cadastro no Auth já teve sucesso
       }
@@ -168,12 +169,27 @@ export default function Cadastro({ onSuccess }) {
                 id="cad-nome"
                 type="text"
                 className="form-input"
-                placeholder="Dra. Maria Silva"
+                placeholder="Maria Silva"
                 value={nome}
                 onChange={(e) => { setNome(e.target.value); clearErrors(); }}
                 autoComplete="name"
                 required
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="cad-genero">Título / Pronome de Tratamento</label>
+              <select
+                id="cad-genero"
+                className="form-input"
+                value={genero}
+                onChange={(e) => { setGenero(e.target.value); clearErrors(); }}
+                required
+                style={{ background: '#111827', color: '#fff' }}
+              >
+                <option value="Feminino">Dra. (Feminino)</option>
+                <option value="Masculino">Dr. (Masculino)</option>
+              </select>
             </div>
 
             <div className="form-group">

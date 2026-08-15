@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getDashboardData } from '../lib/db';
+import { getDashboardData, getTituloNutricionista } from '../lib/db';
 
 export default function DashboardHome({ session, nutricionista }) {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ export default function DashboardHome({ session, nutricionista }) {
   });
   const [loading, setLoading] = useState(true);
 
+  const titulo = getTituloNutricionista(nutricionista);
   const userName = nutricionista?.nome || session?.user?.name || 'Nutricionista';
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function DashboardHome({ session, nutricionista }) {
     <div className="dashboard-home">
       {/* Banner de boas-vindas */}
       <div className="welcome-banner">
-        <h2>{saudacao}, Dra. {userName.split(' ')[0]}! 👋</h2>
+        <h2>{saudacao}, {titulo} {userName.split(' ')[0]}! 👋</h2>
         <p>Bem-vinda ao NutriMi. Acompanhe seus pacientes e consultas em tempo real.</p>
       </div>
 

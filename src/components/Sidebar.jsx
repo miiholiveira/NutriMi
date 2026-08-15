@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { getTituloNutricionista } from '../lib/db';
 
-export default function Sidebar({ session, onLogout }) {
-  const userName = session?.user?.name || session?.name || 'Nutricionista';
+export default function Sidebar({ session, nutricionista, onLogout }) {
+  const titulo = getTituloNutricionista(nutricionista);
+  const rawName = nutricionista?.nome || session?.user?.name || session?.name || 'Nutricionista';
+  const userName = rawName.startsWith('Dr.') || rawName.startsWith('Dra.') ? rawName : `${titulo} ${rawName}`;
   const userEmail = session?.user?.email || '';
 
   const menuItems = [

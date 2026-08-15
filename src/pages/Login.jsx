@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth';
+import Modal from '../components/Modal';
 
 const FEATURES = [
   { icon: '🥗', label: 'Planos alimentares personalizados' },
@@ -15,6 +16,13 @@ export default function Login({ onSuccess }) {
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+
+  // Password Reset Modal state
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMsg, setResetMsg] = useState('');
+  const [resetError, setResetError] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -55,6 +63,33 @@ export default function Login({ onSuccess }) {
       setErro('Ocorreu um erro inesperado. Tente novamente.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleResetSubmit(e) {
+    e.preventDefault();
+    setResetError('');
+    setResetMsg('');
+
+    if (!resetEmail.trim()) {
+      setResetError('Por favor, informe o seu e-mail cadastrado.');
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      if (authClient.forgetPassword) {
+        await authClient.forgetPassword({
+          email: resetEmail.trim().toLowerCase(),
+          redirectTo: `${window.location.origin}/reset-senha`
+        });
+      }
+      setResetMsg('Se o e-mail informado estiver cadastrado, enviamos as instruções e o link seguro de redefinição para a sua caixa de entrada.');
+    } catch (err) {
+      console.error('Forget password error:', err);
+      setResetMsg('Se o e-mail informado estiver cadastrado, enviamos as instruções de redefinição para a sua caixa de entrada.');
+    } finally {
+      setResetLoading(false);
     }
   }
 
@@ -118,7 +153,16 @@ export default function Login({ onSuccess }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="login-senha">Senha</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="form-label" htmlFor="login-senha">Senha</label>
+                <button
+                  type="button"
+                  onClick={() => { setResetEmail(email); setResetError(''); setResetMsg(''); setResetModalOpen(true); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--royal-blue-light)', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  Esqueci minha senha
+                </button>
+              </div>
               <input
                 id="login-senha"
                 type="password"
@@ -151,6 +195,56 @@ export default function Login({ onSuccess }) {
           </div>
         </div>
       </div>
+
+      {/* Modal Esqueci Minha Senha */}
+      <Modal
+        isOpen={resetModalOpen}
+        onClose={() => setResetModalOpen(false)}
+        title="🔒 Recuperação de Senha"
+        size="medium"
+      >
+        <form onSubmit={handleResetSubmit} className="auth-form">
+          <p style={{ fontSize: '0.9rem', color: 'var(--gray-300)', marginBottom: '1.25rem' }}>
+            Digite o e-mail cadastrado na sua conta. Enviaremos um link de redefinição de senha com segurança.
+          </p>
+
+          {resetError && (
+            <div className="alert alert-error" style={{ marginBottom: '1rem' }}>
+              <span>⚠️</span>
+              <span>{resetError}</span>
+            </div>
+          )}
+
+          {resetMsg && (
+            <div className="alert alert-success" style={{ marginBottom: '1rem' }}>
+              <span>✅</span>
+              <span>{resetMsg}</span>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="reset-email">E-mail Cadastrado</label>
+            <input
+              id="reset-email"
+              type="email"
+              className="form-input"
+              placeholder="seu@email.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
+            <button type="button" className="btn-secondary" onClick={() => setResetModalOpen(false)}>
+              Fechar
+            </button>
+            <button type="submit" className="btn-primary" disabled={resetLoading}>
+              {resetLoading ? <><span className="spinner" />Enviando...</> : 'Enviar Link de Redefinição'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPacientes, savePaciente, updatePaciente, deletePaciente } from '../lib/db';
+import { calcularIMC, calcularPesoIdeal } from '../utils/healthCalculators';
 import Modal from '../components/Modal';
 
 export default function Pacientes({ nutricionista }) {
@@ -8,7 +9,10 @@ export default function Pacientes({ nutricionista }) {
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
+  // Toast feedback
+  const [toast, setToast] = useState({ message: '', type: 'success' });
+
   // Controle do Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -41,6 +45,11 @@ export default function Pacientes({ nutricionista }) {
 
   const [formError, setFormError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+
+  function showToast(message, type = 'success') {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: 'success' }), 4000);
+  }
 
   useEffect(() => {
     if (nutricionista?.id) {
@@ -124,9 +133,10 @@ export default function Pacientes({ nutricionista }) {
     if (window.confirm('Tem certeza que deseja excluir este paciente? Todos os planos e consultas associados também serão apagados.')) {
       try {
         await deletePaciente(id);
+        showToast('Paciente excluído com sucesso.', 'info');
         loadPacientes();
       } catch (err) {
-        alert('Erro ao excluir paciente.');
+        showToast('Erro ao excluir paciente.', 'error');
       }
     }
   }
@@ -164,8 +174,10 @@ export default function Pacientes({ nutricionista }) {
 
       if (editMode) {
         await updatePaciente(currentId, dataPayload);
+        showToast('Paciente atualizado com sucesso! 🎉', 'success');
       } else {
         await savePaciente(dataPayload);
+        showToast('Paciente cadastrado com sucesso! 🚀', 'success');
       }
       setModalOpen(false);
       loadPacientes();
@@ -176,17 +188,36 @@ export default function Pacientes({ nutricionista }) {
     }
   }
 
-  const filteredPacientes = pacientes.filter(p => 
+  const filteredPacientes = pacientes.filter(p =>
     p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Calculadora de saúde para o modal
+  const imcLive = calcularIMC(form.peso_inicial, form.altura);
+  const pesoIdealLive = calcularPesoIdeal(form.altura, form.sexo);
+
   return (
     <div>
+      {/* Toast Notification */}
+      {toast.message && (
+        <div className={`alert alert-${toast.type}`} style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 9999,
+          boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+          animation: 'slide-in 0.3s ease-out'
+        }}>
+          <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       <div className="page-header">
         <div className="page-title">
           <h1>Meus Pacientes</h1>
-          <p>Cadastre e gerencie a ficha clínica dos seus pacientes</p>
+          <p>Cadastre, edite e gerencie a ficha clínica dos seus pacientes</p>
         </div>
         <div className="page-actions">
           <button className="btn-primary" onClick={handleOpenCreate}>
@@ -221,6 +252,7 @@ export default function Pacientes({ nutricionista }) {
                   <th>Nome</th>
                   <th>Contato</th>
                   <th>Gênero</th>
+                  <th>IMC / Peso Ideal</th>
                   <th>Objetivos</th>
                   <th>Ações</th>
                 </tr>
@@ -228,53 +260,68 @@ export default function Pacientes({ nutricionista }) {
               <tbody>
                 {filteredPacientes.length === 0 ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '2rem' }}>
+                    <td colSpan="6" style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '2rem' }}>
                       Nenhum paciente cadastrado.
                     </td>
                   </tr>
                 ) : (
-                  filteredPacientes.map((paciente) => (
-                    <tr key={paciente.id}>
-                      <td style={{ fontWeight: 600, color: 'var(--gray-800)' }}>{paciente.nome}</td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-                          <span>{paciente.email || '—'}</span>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>{paciente.whatsapp || '—'}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`badge ${paciente.sexo === 'Masculino' ? 'badge-blue' : 'badge-burgundy'}`}>
-                          {paciente.sexo}
-                        </span>
-                      </td>
-                      <td>
-                        {paciente.objetivos && paciente.objetivos.length > 0 ? (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                            {paciente.objetivos.map((o) => (
-                              <span key={o} className="badge" style={{ background: 'var(--gray-50)', color: 'var(--gray-600)' }}>{o}</span>
-                            ))}
+                  filteredPacientes.map((paciente) => {
+                    const imc = calcularIMC(paciente.peso_inicial, paciente.altura);
+                    const pi = calcularPesoIdeal(paciente.altura, paciente.sexo);
+                    return (
+                      <tr key={paciente.id}>
+                        <td style={{ fontWeight: 600, color: 'var(--white)' }}>{paciente.nome}</td>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+                            <span>{paciente.email || '—'}</span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>{paciente.whatsapp || '—'}</span>
                           </div>
-                        ) : '—'}
-                      </td>
-                      <td className="actions-cell">
-                        <button className="btn-action" title="Histórico de Consultas" onClick={() => navigate(`/dashboard/consultas?paciente=${paciente.id}`)}>
-                          📅
-                        </button>
-                        <button className="btn-action" title="Planos Alimentares" onClick={() => navigate(`/dashboard/planos?paciente=${paciente.id}`)}>
-                          🥗
-                        </button>
-                        <button className="btn-action" title="Relatório de Evolução" onClick={() => navigate(`/dashboard/relatorios?paciente=${paciente.id}`)}>
-                          📊
-                        </button>
-                        <button className="btn-action" title="Editar Ficha" onClick={() => handleOpenEdit(paciente)}>
-                          ✏️
-                        </button>
-                        <button className="btn-action btn-action-delete" title="Excluir Paciente" onClick={() => handleDelete(paciente.id)}>
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td>
+                          <span className={`badge ${paciente.sexo === 'Masculino' ? 'badge-blue' : 'badge-burgundy'}`}>
+                            {paciente.sexo}
+                          </span>
+                        </td>
+                        <td>
+                          {imc ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                              <span style={{ fontWeight: 700, color: imc.cor }}>{imc.valor} kg/m²</span>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--gray-400)' }}>{imc.classificacao}</span>
+                              {pi && <span style={{ fontSize: '0.72rem', color: '#10b981' }}>Faixa ideal: {pi.faixaFormatada}</span>}
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--gray-400)' }}>—</span>
+                          )}
+                        </td>
+                        <td>
+                          {paciente.objetivos && paciente.objetivos.length > 0 ? (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                              {paciente.objetivos.map((o) => (
+                                <span key={o} className="badge" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--gray-300)' }}>{o}</span>
+                              ))}
+                            </div>
+                          ) : '—'}
+                        </td>
+                        <td className="actions-cell">
+                          <button className="btn-action" title="Histórico de Consultas" onClick={() => navigate(`/dashboard/consultas?paciente=${paciente.id}`)}>
+                            📅
+                          </button>
+                          <button className="btn-action" title="Planos Alimentares" onClick={() => navigate(`/dashboard/planos?paciente=${paciente.id}`)}>
+                            🥗
+                          </button>
+                          <button className="btn-action" title="Relatório de Evolução" onClick={() => navigate(`/dashboard/relatorios?paciente=${paciente.id}`)}>
+                            📊
+                          </button>
+                          <button className="btn-action" title="Editar Ficha do Paciente" onClick={() => handleOpenEdit(paciente)} style={{ background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                            ✏️ Editar
+                          </button>
+                          <button className="btn-action btn-action-delete" title="Excluir Paciente" onClick={() => handleDelete(paciente.id)}>
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -282,11 +329,11 @@ export default function Pacientes({ nutricionista }) {
         )}
       </div>
 
-      {/* Modal Cadastro/Edicao */}
+      {/* Modal Cadastro / Edição */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editMode ? 'Editar Paciente' : 'Novo Paciente'}
+        title={editMode ? '✏️ Editar Ficha do Paciente' : '➕ Novo Paciente'}
         size="large"
       >
         <form onSubmit={handleSubmit} className="auth-form">
@@ -294,6 +341,42 @@ export default function Pacientes({ nutricionista }) {
             <div className="alert alert-error">
               <span>⚠️</span>
               <span>{formError}</span>
+            </div>
+          )}
+
+          {/* Calculadora Automática de Saúde (Preview em tempo real) */}
+          {imcLive && pesoIdealLive && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(136, 19, 55, 0.25) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '16px',
+              padding: '1.25rem',
+              marginBottom: '1.5rem',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '1.25rem'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                  💡 IMC Automático
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.2rem' }}>
+                  <span style={{ fontSize: '2rem', fontWeight: 800, color: imcLive.cor }}>{imcLive.valor}</span>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 700, color: imcLive.cor }}>{imcLive.classificacao}</span>
+                </div>
+              </div>
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                  ⚖️ Faixa de Peso Ideal (Eutrofia)
+                </span>
+                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#10b981', marginTop: '0.2rem' }}>
+                  {pesoIdealLive.faixaFormatada}
+                </div>
+                <span style={{ fontSize: '0.78rem', color: 'var(--gray-400)' }}>
+                  Ideal Devine: <strong>{pesoIdealLive.estimadoDevine} kg</strong>
+                </span>
+              </div>
             </div>
           )}
 
@@ -319,22 +402,34 @@ export default function Pacientes({ nutricionista }) {
                 className="form-input"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="email@paciente.com"
+                placeholder="paciente@email.com"
               />
             </div>
             <div className="form-group">
-              <label className="form-label">WhatsApp</label>
+              <label className="form-label">WhatsApp / Telefone</label>
               <input
                 type="text"
                 className="form-input"
                 value={form.whatsapp}
                 onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                placeholder="(00) 00000-0000"
+                placeholder="(11) 99999-9999"
               />
             </div>
           </div>
 
           <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Sexo do Paciente</label>
+              <select
+                className="form-input"
+                value={form.sexo}
+                onChange={(e) => setForm({ ...form, sexo: e.target.value })}
+                style={{ background: '#111827', color: '#fff' }}
+              >
+                <option value="Feminino">Feminino</option>
+                <option value="Masculino">Masculino</option>
+              </select>
+            </div>
             <div className="form-group">
               <label className="form-label">Data de Nascimento</label>
               <input
@@ -344,36 +439,24 @@ export default function Pacientes({ nutricionista }) {
                 onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Sexo</label>
-              <select
-                className="form-select"
-                value={form.sexo}
-                onChange={(e) => setForm({ ...form, sexo: e.target.value })}
-              >
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
           </div>
 
-          <div className="form-section-title">⚖️ Avaliação Física e Metas</div>
+          <div className="form-section-title">📏 Medidas Antropométricas</div>
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Altura (cm)</label>
+              <label className="form-label">Altura (cm ou metros)</label>
               <input
                 type="number"
                 step="0.01"
                 className="form-input"
                 value={form.altura}
                 onChange={(e) => setForm({ ...form, altura: e.target.value })}
-                placeholder="Ex: 1.70"
+                placeholder="Ex: 170 cm ou 1.70 m"
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Peso Inicial (kg)</label>
+              <label className="form-label">Peso Inicial / Atual (kg)</label>
               <input
                 type="number"
                 step="0.1"
@@ -383,44 +466,42 @@ export default function Pacientes({ nutricionista }) {
                 placeholder="Ex: 72.5"
               />
             </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Nível de Atividade Física</label>
-            <select
-              className="form-select"
-              value={form.nivel_atividade}
-              onChange={(e) => setForm({ ...form, nivel_atividade: e.target.value })}
-            >
-              <option value="Sedentário">Sedentário (Pouco ou nenhum exercício)</option>
-              <option value="Leve">Atividade Leve (Exercício leve 1-3 dias/semana)</option>
-              <option value="Moderado">Atividade Moderada (Exercício moderado 3-5 dias/semana)</option>
-              <option value="Intenso">Atividade Intensa (Exercício pesado 6-7 dias/semana)</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Objetivos Principais</label>
-            <div className="checkbox-group">
-              {['Emagrecimento', 'Hipertrofia', 'Saúde e Bem-estar', 'Performance Esportiva', 'Reeducação Alimentar', 'Ganho de Peso'].map(obj => (
-                <label key={obj} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={form.objetivos.includes(obj)}
-                    onChange={() => handleCheckboxChange('objetivos', obj)}
-                  />
-                  {obj}
-                </label>
-              ))}
+            <div className="form-group">
+              <label className="form-label">Nível de Atividade Diária</label>
+              <select
+                className="form-input"
+                value={form.nivel_atividade}
+                onChange={(e) => setForm({ ...form, nivel_atividade: e.target.value })}
+                style={{ background: '#111827', color: '#fff' }}
+              >
+                <option value="Sedentário">Sedentário</option>
+                <option value="Leve">Leve (1-2x/semana)</option>
+                <option value="Moderado">Moderado (3-5x/semana)</option>
+                <option value="Intenso">Intenso (6-7x/semana)</option>
+              </select>
             </div>
           </div>
 
-          <div className="form-section-title">🏥 Anamnese Clínica e Restrições</div>
+          <div className="form-section-title">🎯 Objetivos do Paciente</div>
+          <div className="checkbox-group" style={{ marginBottom: '1.25rem' }}>
+            {['Emagrecimento', 'Hipertrofia', 'Reeducação Alimentar', 'Saúde & Disposição', 'Desempenho Esportivo'].map(obj => (
+              <label key={obj} className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={form.objetivos.includes(obj)}
+                  onChange={() => handleCheckboxChange('objetivos', obj)}
+                />
+                {obj}
+              </label>
+            ))}
+          </div>
+
+          <div className="form-section-title">🩺 Saúde & Anamnese Clínica</div>
 
           <div className="form-group">
-            <label className="form-label">Patologias (Condições Médicas)</label>
+            <label className="form-label">Patologias / Condições Diagnosticadas</label>
             <div className="checkbox-group">
-              {['Diabetes', 'Hipertensão', 'Gastrite/Refluxo', 'Intestino Irritável', 'Colesterol Alto', 'Hipotireoidismo'].map(pat => (
+              {['Diabetes', 'Hipertensão', 'Dislipidemia (Colesterol/Triglicerídeos)', 'Gastrite / Refluxo', 'SOP', 'Hipotireoidismo'].map(pat => (
                 <label key={pat} className="checkbox-label">
                   <input
                     type="checkbox"
@@ -436,24 +517,23 @@ export default function Pacientes({ nutricionista }) {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Restrições Alimentares</label>
-              <div className="checkbox-group" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {['Intolerância à Lactose', 'Sensibilidade ao Glúten', 'Vegano/Vegetariano', 'Sem restrições'].map(res => (
-                  <label key={res} className="checkbox-label">
+              <div className="checkbox-group">
+                {['Intolerância à Lactose', 'Celíaco / Sem Glúten', 'Vegetariano', 'Vegano'].map(rest => (
+                  <label key={rest} className="checkbox-label">
                     <input
                       type="checkbox"
-                      checked={form.restricoes_alimentares.includes(res)}
-                      onChange={() => handleCheckboxChange('restricoes_alimentares', res)}
+                      checked={form.restricoes_alimentares.includes(rest)}
+                      onChange={() => handleCheckboxChange('restricoes_alimentares', rest)}
                     />
-                    {res}
+                    {rest}
                   </label>
                 ))}
               </div>
             </div>
-
             <div className="form-group">
-              <label className="form-label">Alergias</label>
-              <div className="checkbox-group" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {['Amendoim / Nozes', 'Frutos do Mar', 'Leite de Vaca', 'Ovo'].map(al => (
+              <label className="form-label">Alergias Alimentares</label>
+              <div className="checkbox-group">
+                {['Amendoim / Oleaginosas', 'Frutos do Mar', 'Ovo', 'Soja', 'Leite de Vaca'].map(al => (
                   <label key={al} className="checkbox-label">
                     <input
                       type="checkbox"
@@ -469,13 +549,13 @@ export default function Pacientes({ nutricionista }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Medicamentos em uso</label>
+              <label className="form-label">Medicamentos em uso contínuo</label>
               <input
                 type="text"
                 className="form-input"
                 value={form.medicamentos}
                 onChange={(e) => setForm({ ...form, medicamentos: e.target.value })}
-                placeholder="Ex: Metformina, Puran T4"
+                placeholder="Ex: Puran T4 50mcg, Anticoncepcional..."
               />
             </div>
             <div className="form-group">
@@ -485,18 +565,20 @@ export default function Pacientes({ nutricionista }) {
                 className="form-input"
                 value={form.suplementos}
                 onChange={(e) => setForm({ ...form, suplementos: e.target.value })}
-                placeholder="Ex: Creatina, Whey Protein"
+                placeholder="Ex: Whey Protein, Creatina 5g, Vitamina D..."
               />
             </div>
           </div>
 
-          <div className="form-section-title">⏰ Rotina e Hábitos</div>
+          <div className="form-section-title">⏰ Rotina & Estilo de Vida</div>
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Refeições ao dia</label>
+              <label className="form-label">Refeições por dia</label>
               <input
                 type="number"
+                min="1"
+                max="8"
                 className="form-input"
                 value={form.refeicoes_por_dia}
                 onChange={(e) => setForm({ ...form, refeicoes_por_dia: e.target.value })}
@@ -572,12 +654,12 @@ export default function Pacientes({ nutricionista }) {
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <button type="button" className="btn-secondary" onClick={() => setModalOpen(false)}>
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={actionLoading}>
-              {actionLoading ? <div className="spinner" /> : (editMode ? 'Salvar Alterações' : 'Cadastrar Paciente')}
+              {actionLoading ? <div className="spinner" /> : (editMode ? '💾 Salvar Alterações' : '✨ Cadastrar Paciente')}
             </button>
           </div>
         </form>
