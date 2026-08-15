@@ -194,40 +194,38 @@ body {
   justify-content: center;
   align-items: center;
   padding: 3rem 1.5rem;
-  background: #090d16;
+  background: #080c14;
   overflow: hidden;
 }
 
-/* Ambient Glow Lights */
-.auth-form-panel::before {
-  content: '';
+/* Ambient Glow Lights Decorativos */
+.auth-glow-blue {
   position: absolute;
-  top: -10%;
-  right: -10%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
-  filter: blur(100px);
+  top: -80px;
+  right: -80px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, transparent 70%);
+  filter: blur(80px);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
-.auth-form-panel::after {
-  content: '';
+.auth-glow-burgundy {
   position: absolute;
-  bottom: -10%;
-  right: 15%;
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(159, 18, 57, 0.15) 0%, transparent 70%);
-  filter: blur(120px);
+  bottom: -60px;
+  right: 40px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(159, 18, 57, 0.20) 0%, transparent 70%);
+  filter: blur(90px);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 .auth-form-wrapper {
   position: relative;
-  z-index: 2;
+  z-index: 10;
   width: 100%;
   max-width: 440px;
   padding: 2.5rem 2.25rem;
@@ -237,6 +235,45 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* Botão Alternar Mostrar/Ocultar Senha com Emoji Animado */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 2.8rem !important;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  border-radius: var(--radius-sm);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  opacity: 0.85;
+}
+
+.toggle-password-btn:hover {
+  transform: scale(1.18);
+  opacity: 1;
+}
+
+.toggle-password-btn:active {
+  transform: scale(1.35);
 }
 
 /* Símbolo sempre pequeno no topo esquerdo */

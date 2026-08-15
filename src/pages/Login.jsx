@@ -14,15 +14,16 @@ export default function Login({ onSuccess }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
 
-  // Password Reset Modal state
+  // Modal Esqueci minha senha
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
-  const [resetMsg, setResetMsg] = useState('');
   const [resetError, setResetError] = useState('');
+  const [resetMsg, setResetMsg] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -115,6 +116,9 @@ export default function Login({ onSuccess }) {
 
       {/* Painel direito — formulário */}
       <div className="auth-form-panel">
+        <div className="auth-glow-blue" />
+        <div className="auth-glow-burgundy" />
+
         <div className="auth-form-wrapper">
           {/* Logo */}
           <div className="auth-logo">
@@ -163,16 +167,26 @@ export default function Login({ onSuccess }) {
                   Esqueci minha senha
                 </button>
               </div>
-              <input
-                id="login-senha"
-                type="password"
-                className={`form-input${erro ? ' error' : ''}`}
-                placeholder="Sua senha"
-                value={senha}
-                onChange={(e) => { setSenha(e.target.value); setErro(''); }}
-                autoComplete="current-password"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="login-senha"
+                  type={showSenha ? 'text' : 'password'}
+                  className={`form-input${erro ? ' error' : ''}`}
+                  placeholder="Sua senha"
+                  value={senha}
+                  onChange={(e) => { setSenha(e.target.value); setErro(''); }}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowSenha(!showSenha)}
+                  title={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showSenha ? '🐵' : '🙈'}
+                </button>
+              </div>
             </div>
 
             <button

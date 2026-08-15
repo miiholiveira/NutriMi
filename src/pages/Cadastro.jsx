@@ -10,6 +10,8 @@ export default function Cadastro({ onSuccess }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
+  const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
@@ -134,6 +136,9 @@ export default function Cadastro({ onSuccess }) {
 
       {/* Painel direito — formulário */}
       <div className="auth-form-panel">
+        <div className="auth-glow-blue" />
+        <div className="auth-glow-burgundy" />
+
         <div className="auth-form-wrapper">
           {/* Logo */}
           <div className="auth-logo">
@@ -208,30 +213,50 @@ export default function Cadastro({ onSuccess }) {
 
             <div className="form-group">
               <label className="form-label" htmlFor="cad-senha">Senha</label>
-              <input
-                id="cad-senha"
-                type="password"
-                className="form-input"
-                placeholder="Mínimo 6 caracteres"
-                value={senha}
-                onChange={(e) => { setSenha(e.target.value); clearErrors(); }}
-                autoComplete="new-password"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="cad-senha"
+                  type={showSenha ? 'text' : 'password'}
+                  className="form-input"
+                  placeholder="Mínimo 6 caracteres"
+                  value={senha}
+                  onChange={(e) => { setSenha(e.target.value); clearErrors(); }}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowSenha(!showSenha)}
+                  title={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showSenha ? '🐵' : '🙈'}
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="cad-confirmar-senha">Confirmar senha</label>
-              <input
-                id="cad-confirmar-senha"
-                type="password"
-                className={`form-input${confirmarSenha && senha !== confirmarSenha ? ' error' : ''}`}
-                placeholder="Repita sua senha"
-                value={confirmarSenha}
-                onChange={(e) => { setConfirmarSenha(e.target.value); clearErrors(); }}
-                autoComplete="new-password"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="cad-confirmar-senha"
+                  type={showConfirmarSenha ? 'text' : 'password'}
+                  className={`form-input${confirmarSenha && senha !== confirmarSenha ? ' error' : ''}`}
+                  placeholder="Repita sua senha"
+                  value={confirmarSenha}
+                  onChange={(e) => { setConfirmarSenha(e.target.value); clearErrors(); }}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                  title={showConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showConfirmarSenha ? '🐵' : '🙈'}
+                </button>
+              </div>
               {confirmarSenha && senha !== confirmarSenha && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--error)', marginTop: '0.2rem' }}>
                   As senhas não coincidem
