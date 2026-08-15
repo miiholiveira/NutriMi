@@ -344,11 +344,13 @@ export default function Pacientes({ nutricionista }) {
             </div>
           )}
 
-          {/* Calculadora Automática de Saúde (Preview em tempo real) */}
+          {/* Calculadora Automática de Saúde (Preview em tempo real com Alerta) */}
           {imcLive && pesoIdealLive && (
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(136, 19, 55, 0.25) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: imcLive.alerta
+                ? 'linear-gradient(135deg, rgba(136, 19, 55, 0.35) 0%, rgba(185, 28, 28, 0.25) 100%)'
+                : 'linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%)',
+              border: imcLive.alerta ? '1.5px solid rgba(239, 68, 68, 0.5)' : '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '16px',
               padding: '1.25rem',
               marginBottom: '1.5rem',
@@ -358,12 +360,12 @@ export default function Pacientes({ nutricionista }) {
               gap: '1.25rem'
             }}>
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.8rem', color: imcLive.alerta ? '#fca5a5' : 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                   💡 IMC Automático
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.2rem' }}>
                   <span style={{ fontSize: '2rem', fontWeight: 800, color: imcLive.cor }}>{imcLive.valor}</span>
-                  <span style={{ fontSize: '0.88rem', fontWeight: 700, color: imcLive.cor }}>{imcLive.classificacao}</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: imcLive.cor }}>{imcLive.classificacao}</span>
                 </div>
               </div>
               <div>
@@ -377,6 +379,25 @@ export default function Pacientes({ nutricionista }) {
                   Ideal Devine: <strong>{pesoIdealLive.estimadoDevine} kg</strong>
                 </span>
               </div>
+
+              {imcLive.alerta && (
+                <div style={{
+                  gridColumn: '1 / -1',
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#fca5a5',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span>⚠️ ALERTA DE IMC:</span>
+                  <span>O IMC ({imcLive.valor} kg/m²) está na faixa de {imcLive.classificacao}. Recomendada intervenção nutricional focada.</span>
+                </div>
+              )}
             </div>
           )}
 

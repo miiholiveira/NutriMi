@@ -1129,3 +1129,69 @@ body {
   color: var(--success);
   font-weight: 600;
 }
+
+/* =============================================
+   Regras de Impressão & Exportação PDF (@media print)
+   ============================================= */
+@media print {
+  /* Ocultar elementos de navegação e controles */
+  .sidebar,
+  .no-print,
+  .btn-primary,
+  .btn-secondary,
+  .btn-action,
+  .page-header,
+  .patient-select-wrapper {
+    display: none !important;
+  }
+
+  /* Exibir cabeçalho e rodapé específicos de impressão */
+  .print-only-header,
+  .print-only-footer {
+    display: block !important;
+  }
+
+  body, #root, .app-container, .main-content, .main-content-scroll {
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+
+  .meal-card,
+  .card-table,
+  .day-meals-container,
+  .workout-plan-container {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .meal-title, .form-section-title, h1, h2, h3, h4 {
+    color: #1e3a8a !important;
+  }
+
+  .form-input {
+    background: #f9fafb !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .custom-table th {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    border-bottom: 2px solid #9ca3af !important;
+  }
+
+  .custom-table td {
+    color: #111827 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+}

@@ -1,7 +1,19 @@
 /**
  * Calculadora de Saúde — NutriMi
- * Realiza os cálculos de IMC e Peso Ideal em tempo real
+ * Realiza os cálculos de Idade, IMC, Peso Ideal e TMB (Mifflin-St Jeor) em tempo real
  */
+
+export function calcularIdade(dataNascimento) {
+  if (!dataNascimento) return 30; // valor padrão para estimativa se não informado
+  const hoje = new Date();
+  const nasc = new Date(dataNascimento);
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  const m = hoje.getMonth() - nasc.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
+    idade--;
+  }
+  return idade > 0 ? idade : 30;
+}
 
 export function calcularIMC(pesoKg, alturaCmOrM) {
   const peso = parseFloat(pesoKg);
@@ -11,42 +23,57 @@ export function calcularIMC(pesoKg, alturaCmOrM) {
     return null;
   }
 
-  // Se a altura for informada em cm (ex: 175), converte para metros (1.75)
+  // Converte cm para metros se necessário
   if (altura > 3) {
     altura = altura / 100;
   }
 
   const imc = peso / (altura * altura);
   const imcFormatado = imc.toFixed(1);
+  const numericImc = parseFloat(imcFormatado);
 
   let classificacao = '';
   let cor = '';
+  let alerta = false;
+  let nivelAlerta = 'normal';
 
-  if (imc < 18.5) {
-    classificacao = 'Abaixo do peso';
-    cor = '#3b82f6'; // azul
-  } else if (imc <= 24.9) {
-    classificacao = 'Peso normal (Eutrofia)';
-    cor = '#10b981'; // verde
-  } else if (imc <= 29.9) {
-    classificacao = 'Sobrepeso';
-    cor = '#f59e0b'; // amarelo
-  } else if (imc <= 34.9) {
-    classificacao = 'Obesidade Grau I';
-    cor = '#f97316'; // laranja
-  } else if (imc <= 39.9) {
-    classificacao = 'Obesidade Grau II';
-    cor = '#ef4444'; // vermelho
+  if (numericImc < 18.5) {
+    classificacao = 'Abaixo do Peso';
+    cor = '#f59e0b'; // Amarelo/Laranja
+    alerta = false;
+  } else if (numericImc <= 24.9) {
+    classificacao = 'Peso Ideal / Normal (Eutrofia)';
+    cor = '#10b981'; // Verde Destaque
+    alerta = false;
+  } else if (numericImc <= 29.9) {
+    classificacao = 'Sobrepeso — Alerta de Risco Cardíaco';
+    cor = '#f97316'; // Laranja/Vermelho Claro
+    alerta = true;
+    nivelAlerta = 'alerta';
+  } else if (numericImc <= 34.9) {
+    classificacao = 'Obesidade Grau I — Risco Moderado';
+    cor = '#ef4444'; // Vermelho
+    alerta = true;
+    nivelAlerta = 'perigo';
+  } else if (numericImc <= 39.9) {
+    classificacao = 'Obesidade Grau II — Severa (Risco Alto)';
+    cor = '#be123c'; // Vermelho Escuro
+    alerta = true;
+    nivelAlerta = 'perigo-alto';
   } else {
-    classificacao = 'Obesidade Grau III (Mórbida)';
-    cor = '#881337'; // bordô escuro
+    classificacao = 'Obesidade Grau III — Mórbida (Risco Extremo)';
+    cor = '#881337'; // Vermelho Forte / Alerta Máximo
+    alerta = true;
+    nivelAlerta = 'perigo-maximo';
   }
 
   return {
     valor: imcFormatado,
-    numeric: parseFloat(imcFormatado),
+    numeric: numericImc,
     classificacao,
-    cor
+    cor,
+    alerta,
+    nivelAlerta
   };
 }
 
@@ -54,14 +81,8 @@ export function calcularPesoIdeal(alturaCmOrM, sexo = 'Feminino') {
   let altura = parseFloat(alturaCmOrM);
   if (!altura || altura <= 0) return null;
 
-  let alturaCm = altura;
-  let alturaM = altura;
-
-  if (altura <= 3) {
-    alturaCm = altura * 100;
-  } else {
-    alturaM = altura / 100;
-  }
+  let alturaCm = altura <= 3 ? altura * 100 : altura;
+  let alturaM = altura <= 3 ? altura : altura / 100;
 
   // Faixa de IMC eutrófico (18.5 a 24.9 kg/m²)
   const minPeso = (18.5 * alturaM * alturaM).toFixed(1);
@@ -87,5 +108,39 @@ export function calcularPesoIdeal(alturaCmOrM, sexo = 'Feminino') {
     maxPeso: parseFloat(maxPeso),
     estimadoDevine: parseFloat(pesoDevine.toFixed(1)),
     faixaFormatada: `${minPeso} kg – ${maxPeso} kg`
+  };
+}
+
+/**
+ * Cálculo da TMB (Mifflin-St Jeor) e Gasto Energético Total (TDEE / GET)
+ */
+export function calcularTMB(pesoKg, alturaCmOrM, idade = 30, sexo = 'Feminino', nivelAtividade = 'Leve') {
+  const peso = parseFloat(pesoKg);
+  let altura = parseFloat(alturaCmOrM);
+
+  if (!peso || !altura || peso <= 0 || altura <= 0) return null;
+  const alturaCm = altura <= 3 ? altura * 100 : altura;
+  const isMasculino = String(sexo).toLowerCase().includes('masc');
+
+  // Fórmula de Mifflin-St Jeor
+  let tmb = isMasculino
+    ? (10 * peso) + (6.25 * alturaCm) - (5 * idade) + 5
+    : (10 * peso) + (6.25 * alturaCm) - (5 * idade) - 161;
+
+  tmb = Math.round(tmb);
+
+  // Fator de Atividade Física
+  let fator = 1.375; // Leve
+  const niv = String(nivelAtividade).toLowerCase();
+  if (niv.includes('sedent')) fator = 1.2;
+  else if (niv.includes('moderat')) fator = 1.55;
+  else if (niv.includes('intens')) fator = 1.725;
+
+  const tdee = Math.round(tmb * fator);
+
+  return {
+    tmb,
+    tdee,
+    fator
   };
 }

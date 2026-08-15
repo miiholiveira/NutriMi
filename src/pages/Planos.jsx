@@ -175,8 +175,11 @@ export default function Planos({ nutricionista }) {
           <button className="btn-secondary" onClick={() => handleGenerateAll(selectedPaciente)} disabled={!selectedPaciente}>
             ⚡ Gerar Dieta & Treino Automático
           </button>
+          <button className="btn-secondary" onClick={handlePrintPDF} disabled={!dietPlan}>
+            🖨️ Imprimir
+          </button>
           <button className="btn-primary" onClick={handlePrintPDF} disabled={!dietPlan}>
-            🖨️ Exportar PDF / Imprimir
+            📄 Baixar PDF
           </button>
         </div>
       </div>
@@ -225,13 +228,15 @@ export default function Planos({ nutricionista }) {
       <div className="print-only-header" style={{ display: 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #1e3a8a', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', color: '#1e3a8a', margin: 0 }}>NutriMi — Plano Alimentar & Treinos</h1>
-            <p style={{ margin: 0, color: '#4b5563', fontSize: '0.9rem' }}>Acompanhamento Nutricional Personalizado</p>
+            <h1 style={{ fontSize: '1.8rem', color: '#1e3a8a', margin: 0, fontWeight: 800 }}>NutriMi — Prescrição Nutricional</h1>
+            <p style={{ margin: 0, color: '#4b5563', fontSize: '0.9rem' }}>Acompanhamento & Cuidado Nutricional Personalizado</p>
           </div>
           {selectedPaciente && (
-            <div style={{ textAlign: 'right', fontSize: '0.9rem' }}>
+            <div style={{ textAlign: 'right', fontSize: '0.88rem', color: '#1f2937' }}>
               <strong>Paciente:</strong> {selectedPaciente.nome}<br />
-              <strong>Data:</strong> {new Date().toLocaleDateString('pt-BR')}
+              <strong>Idade:</strong> {dietPlan?.pacienteInfo?.idade || '—'} anos | <strong>Sexo:</strong> {selectedPaciente.sexo}<br />
+              <strong>Peso:</strong> {selectedPaciente.peso_inicial || '—'} kg | <strong>Altura:</strong> {selectedPaciente.altura || '—'} m<br />
+              <strong>Data da Prescrição:</strong> {new Date().toLocaleDateString('pt-BR')}
             </div>
           )}
         </div>
@@ -443,6 +448,22 @@ export default function Planos({ nutricionista }) {
             <button className="btn-primary" onClick={handleSavePlano} disabled={actionLoading} style={{ padding: '0.75rem 2rem' }}>
               {actionLoading ? <div className="spinner" /> : '💾 Salvar Plano Alimentar & Treino'}
             </button>
+          </div>
+
+          {/* Rodapé de Impressão PDF */}
+          <div className="print-only-footer" style={{ display: 'none', marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid #d1d5db' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2rem' }}>
+              <div>
+                <p style={{ fontSize: '0.8rem', color: '#4b5563', margin: 0, fontWeight: 600 }}>NutriMi — Nutrição Inteligente</p>
+                <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Documento emitido para acompanhamento nutricional individual do paciente.</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ borderTop: '1.5px solid #111827', width: '250px', paddingTop: '0.4rem' }}>
+                  <strong style={{ fontSize: '0.88rem', color: '#111827', display: 'block' }}>Assinatura / Carimbo</strong>
+                  <span style={{ fontSize: '0.78rem', color: '#4b5563' }}>Nutricionista Responsável CRN</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
