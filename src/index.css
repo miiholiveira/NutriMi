@@ -91,10 +91,10 @@ body {
   position: relative;
   background-color: #090d16;
   background-image: 
-    linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 58, 138, 0.82) 50%, rgba(136, 19, 55, 0.85) 100%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.78) 50%, rgba(136, 19, 55, 0.82) 100%),
     url('/images/bg-health.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: center bottom;
   background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
@@ -188,18 +188,55 @@ body {
 }
 
 .auth-form-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
-  background: rgba(9, 13, 22, 0.95);
-  backdrop-filter: blur(10px);
+  padding: 3rem 1.5rem;
+  background: #090d16;
+  overflow: hidden;
+}
+
+/* Ambient Glow Lights */
+.auth-form-panel::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.auth-form-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  right: 15%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(159, 18, 57, 0.15) 0%, transparent 70%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .auth-form-wrapper {
+  position: relative;
+  z-index: 2;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
+  padding: 2.5rem 2.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 /* Símbolo sempre pequeno no topo esquerdo */
@@ -288,24 +325,24 @@ body {
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--royal-blue-light);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* Botões Clicáveis Premium */
+/* Botões Clicáveis Premium com Gradiente da Marca (Azul a Bordô) */
 .btn-primary {
   width: 100%;
   padding: 0.85rem 1.5rem;
-  background: linear-gradient(135deg, var(--royal-blue) 0%, var(--royal-blue-light) 100%);
+  background: linear-gradient(135deg, #1D4ED8 0%, #9F1239 100%);
   color: var(--white);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 600;
   font-family: var(--font-family);
   cursor: pointer;
-  box-shadow: var(--shadow-button);
+  box-shadow: 0 4px 18px rgba(29, 78, 216, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,9 +351,44 @@ body {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(30, 58, 138, 0.6);
-  filter: brightness(1.1);
+  transform: scale(1.01);
+  box-shadow: 0 8px 25px -5px rgba(29, 78, 216, 0.45);
+  filter: brightness(1.08);
+}
+
+.auth-link-forgot {
+  background: none;
+  border: none;
+  color: #60a5fa !important;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.auth-link-forgot:hover {
+  color: #93c5fd !important;
+  text-decoration: underline;
+}
+
+.auth-switch {
+  color: var(--gray-300);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.auth-switch a {
+  color: #93c5fd !important;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 0.35rem;
+  transition: color var(--transition-fast);
+}
+
+.auth-switch a:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
 }
 
 .btn-primary:active {

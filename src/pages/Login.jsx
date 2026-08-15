@@ -157,8 +157,8 @@ export default function Login({ onSuccess }) {
                 <label className="form-label" htmlFor="login-senha">Senha</label>
                 <button
                   type="button"
+                  className="auth-link-forgot"
                   onClick={() => { setResetEmail(email); setResetError(''); setResetMsg(''); setResetModalOpen(true); }}
-                  style={{ background: 'none', border: 'none', color: 'var(--royal-blue-light)', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 600 }}
                 >
                   Esqueci minha senha
                 </button>
