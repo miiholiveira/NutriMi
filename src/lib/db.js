@@ -1,8 +1,13 @@
 import { neon } from '@neondatabase/serverless';
 
+const DEFAULT_DATABASE_URL = 'postgresql://neondb_owner:npg_3z5DlGewKEVy@ep-spring-hall-acnmexgl-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require';
+
 // Helper local para criar a conexão neon com o timezone configurado
 function getDb() {
-  const url = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DATABASE_URL) || (typeof process !== 'undefined' && process.env?.VITE_DATABASE_URL);
+  const url =
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DATABASE_URL) ||
+    (typeof process !== 'undefined' && process.env?.VITE_DATABASE_URL) ||
+    DEFAULT_DATABASE_URL;
   return neon(url);
 }
 
