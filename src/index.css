@@ -194,33 +194,37 @@ body {
   justify-content: center;
   align-items: center;
   padding: 3rem 1.5rem;
-  background: #080c14;
+  background-color: #080c14;
+  background-image: 
+    radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(159, 18, 57, 0.30) 0%, transparent 55%);
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
 /* Ambient Glow Lights Decorativos */
 .auth-glow-blue {
   position: absolute;
-  top: -80px;
-  right: -80px;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, transparent 70%);
-  filter: blur(80px);
+  top: -60px;
+  right: -60px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.45) 0%, rgba(29, 78, 216, 0.15) 50%, transparent 70%);
+  filter: blur(70px);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .auth-glow-burgundy {
   position: absolute;
-  bottom: -60px;
-  right: 40px;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(159, 18, 57, 0.20) 0%, transparent 70%);
-  filter: blur(90px);
+  bottom: -40px;
+  right: 20px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.35) 0%, rgba(159, 18, 57, 0.15) 50%, transparent 70%);
+  filter: blur(80px);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .auth-form-wrapper {
@@ -229,12 +233,12 @@ body {
   width: 100%;
   max-width: 440px;
   padding: 2.5rem 2.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
 }
 
 /* Botão Alternar Mostrar/Ocultar Senha com Emoji Animado */
@@ -246,34 +250,37 @@ body {
 }
 
 .password-input-wrapper .form-input {
-  padding-right: 2.8rem !important;
+  padding-right: 3rem !important;
 }
 
 .toggle-password-btn {
   position: absolute;
   right: 0.75rem;
-  background: none;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
   border: none;
   font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem;
-  border-radius: var(--radius-sm);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
-  opacity: 0.85;
+  padding: 0.25rem;
+  z-index: 10;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .toggle-password-btn:hover {
-  transform: scale(1.18);
-  opacity: 1;
+  transform: translateY(-50%) scale(1.18);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
 }
 
 .toggle-password-btn:active {
-  transform: scale(1.35);
+  transform: translateY(-50%) scale(1.35);
 }
 
 /* Símbolo sempre pequeno no topo esquerdo */
