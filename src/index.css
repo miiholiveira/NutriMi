@@ -896,3 +896,236 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================
+   Prompt 3 — 3D Cards & Visual Styling
+   ============================================= */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-card {
+  background: rgba(17, 24, 39, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.card-3d:hover {
+  transform: translateY(-6px) rotateX(2deg);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-blue {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 58, 138, 0.35) 100%);
+  border-top: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.card-burgundy {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(136, 19, 55, 0.35) 100%);
+  border-top: 1px solid rgba(190, 18, 60, 0.4);
+}
+
+.card-warning {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(120, 53, 15, 0.3) 100%);
+  border-top: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.card-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.card-icon-wrapper.blue {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+}
+
+.card-icon-wrapper.burgundy {
+  background: linear-gradient(135deg, #9f1239, #be123c);
+}
+
+.card-icon-wrapper.warning {
+  background: linear-gradient(135deg, #b45309, #f59e0b);
+}
+
+.card-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--gray-300);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-tag.warning-tag {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fef08a;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.card-body {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.card-value {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--white);
+  letter-spacing: -1px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.card-subtext {
+  font-size: 0.82rem;
+  color: var(--gray-400);
+  margin-top: 0.4rem;
+}
+
+.card-footer {
+  margin-top: 1.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-link {
+  color: var(--royal-blue-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all var(--transition-fast);
+}
+
+.card-link:hover {
+  color: var(--white);
+  transform: translateX(4px);
+}
+
+.pacientes-sem-retorno-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.paciente-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.paciente-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.paciente-name-btn {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  transition: color var(--transition-fast);
+}
+
+.paciente-name-btn:hover {
+  color: #fbbf24;
+  text-decoration: underline;
+}
+
+.paciente-avatar {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.paciente-date {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px dashed rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.empty-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  font-size: 0.88rem;
+  color: var(--success);
+  font-weight: 600;
+}

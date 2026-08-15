@@ -322,3 +322,63 @@ export async function getGlobalStats(nutricionistaId) {
     return { pacientes: 0, nutricionistas: 0, consultas: 0, planos: 0 };
   }
 }
+
+/**
+ * Retorna os dados em tempo real do Dashboard Principal (Prompt 3):
+ * 1. Total de pacientes ativos da nutricionista logada
+ * 2. Consultas da semana atual
+ * 3. Lista de pacientes sem retorno (última consulta > 30 dias e sem retorno futuro agendado)
+ */
+export async function getDashboardData(nutricionistaId) {
+  try {
+    const sql = getDb();
+    
+    // 1. Total de pacientes cadastrados pela nutricionista logada
+    const pacRes = await sql`
+      SELECT COUNT(*)::int as count 
+      FROM pacientes 
+      WHERE nutricionista_id = ${nutricionistaId}
+    `;
+    const totalPacientes = pacRes[0]?.count || 0;
+
+    // 2. Consultas da semana atual da nutricionista logada
+    const consRes = await sql`
+      SELECT COUNT(*)::int as count 
+      FROM consultas 
+      WHERE paciente_id IN (SELECT id FROM pacientes WHERE nutricionista_id = ${nutricionistaId})
+        AND data_consulta >= date_trunc('week', CURRENT_DATE)
+        AND data_consulta < date_trunc('week', CURRENT_DATE) + INTERVAL '7 days'
+    `;
+    const consultasSemana = consRes[0]?.count || 0;
+
+    // 3. Pacientes sem retorno (última consulta há mais de 30 dias e sem próximo retorno agendado no futuro)
+    const semRetornoRes = await sql`
+      SELECT 
+        p.id,
+        p.nome,
+        COALESCE(MAX(c.data_consulta), p.created_at::date) as ultima_consulta,
+        MAX(c.proximo_retorno) as proximo_retorno
+      FROM pacientes p
+      LEFT JOIN consultas c ON c.paciente_id = p.id
+      WHERE p.nutricionista_id = ${nutricionistaId}
+      GROUP BY p.id, p.nome, p.created_at
+      HAVING (MAX(c.data_consulta) IS NOT NULL AND MAX(c.data_consulta) < CURRENT_DATE - INTERVAL '30 days')
+          OR (MAX(c.data_consulta) IS NULL AND p.created_at < CURRENT_DATE - INTERVAL '30 days')
+          AND (MAX(c.proximo_retorno) IS NULL OR MAX(c.proximo_retorno) <= CURRENT_DATE)
+      ORDER BY ultima_consulta ASC
+    `;
+
+    return {
+      totalPacientes,
+      consultasSemana,
+      pacientesSemRetorno: semRetornoRes || []
+    };
+  } catch (err) {
+    console.error('Erro ao buscar dados do dashboard:', err);
+    return {
+      totalPacientes: 0,
+      consultasSemana: 0,
+      pacientesSemRetorno: []
+    };
+  }
+}

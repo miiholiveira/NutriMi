@@ -6,10 +6,10 @@ export default function Sidebar({ session, onLogout }) {
   const userEmail = session?.user?.email || '';
 
   const menuItems = [
-    { path: '/dashboard', label: 'Visão Geral', icon: '🏠', end: true },
+    { path: '/dashboard', label: 'Dashboard', icon: '🏠', end: true },
     { path: '/dashboard/pacientes', label: 'Pacientes', icon: '👥' },
+    { path: '/dashboard/planos', label: 'Dietas', icon: '🥗' },
     { path: '/dashboard/consultas', label: 'Consultas', icon: '📅' },
-    { path: '/dashboard/planos', label: 'Planos', icon: '🥗' },
     { path: '/dashboard/relatorios', label: 'Relatórios', icon: '📊' },
   ];
 
