@@ -163,7 +163,7 @@ export default function Relatorios({ nutricionista }) {
             <circle cx={pt.x} cy={pt.y} r="5" fill="var(--white)" stroke="var(--burgundy)" strokeWidth="2.5" />
             
             {/* Texto de Valor de Peso (Acima do Ponto) */}
-            <text x={pt.x} y={pt.y - 10} textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--gray-800)">
+            <text x={pt.x} y={pt.y - 10} textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--white)">
               {pt.label}
             </text>
 
@@ -218,7 +218,7 @@ export default function Relatorios({ nutricionista }) {
         <div className="reports-layout">
           {/* Gráfico */}
           <div className="chart-card">
-            <h3 style={{ color: 'var(--gray-800)', fontSize: '1rem', fontWeight: 700, borderBottom: '1px solid var(--gray-100)', paddingBottom: '0.75rem' }}>
+            <h3 style={{ color: 'var(--white)', fontSize: '1rem', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
               Evolução de Peso
             </h3>
             <div className="chart-container">
@@ -227,7 +227,7 @@ export default function Relatorios({ nutricionista }) {
 
             {/* Tabela Resumo */}
             <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ color: 'var(--gray-600)', fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+              <h4 style={{ color: 'var(--gray-300)', fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem' }}>
                 Histórico Antropométrico
               </h4>
               <div className="responsive-table">
@@ -260,7 +260,7 @@ export default function Relatorios({ nutricionista }) {
           {/* Cards Rápidos de Status */}
           <div className="info-side-panel">
             <div className="info-card" style={{ borderLeft: '4px solid var(--royal-blue)' }}>
-              <h3 style={{ color: 'var(--gray-800)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>
+              <h3 style={{ color: 'var(--white)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>
                 Resumo do Paciente
               </h3>
               
@@ -274,7 +274,7 @@ export default function Relatorios({ nutricionista }) {
               </div>
               <div className="info-stat-row">
                 <span className="info-stat-label">Diferença</span>
-                <span className="info-stat-value" style={{ color: diferencaPeso && parseFloat(diferencaPeso) < 0 ? 'var(--success)' : 'var(--gray-800)' }}>
+                <span className="info-stat-value" style={{ color: diferencaPeso && parseFloat(diferencaPeso) < 0 ? 'var(--success)' : 'var(--white)' }}>
                   {diferencaPeso ? (parseFloat(diferencaPeso) > 0 ? `+${diferencaPeso} kg` : `${diferencaPeso} kg`) : '—'}
                 </span>
               </div>
@@ -282,7 +282,7 @@ export default function Relatorios({ nutricionista }) {
 
             {imc && (
               <div className="info-card" style={{ borderLeft: '4px solid var(--burgundy)' }}>
-                <h3 style={{ color: 'var(--gray-800)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>
+                <h3 style={{ color: 'var(--white)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>
                   Índice de Massa Corporal (IMC)
                 </h3>
                 

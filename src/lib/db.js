@@ -399,3 +399,50 @@ export async function getDashboardData(nutricionistaId) {
     };
   }
 }
+
+/**
+ * CRUD e Busca de Alimentos no Banco de Dados
+ */
+export async function getAlimentos(searchTerm = '') {
+  try {
+    const sql = getDb();
+    if (searchTerm && searchTerm.trim().length > 0) {
+      const term = `%${searchTerm.trim().toLowerCase()}%`;
+      return await sql`
+        SELECT * FROM alimentos 
+        WHERE LOWER(nome) LIKE ${term} OR LOWER(categoria) LIKE ${term}
+        ORDER BY nome ASC 
+        LIMIT 100
+      `;
+    }
+    return await sql`SELECT * FROM alimentos ORDER BY categoria ASC, nome ASC`;
+  } catch (err) {
+    console.error('Erro ao buscar alimentos do banco:', err);
+    return [];
+  }
+}
+
+export async function saveAlimento(alimento) {
+  try {
+    return await runWithTimezone(async (sql) => {
+      const rows = await sql`
+        INSERT INTO alimentos (
+          nome, categoria, calorias_100g, proteinas_100g, 
+          carboidratos_100g, gorduras_100g, fibras_100g, 
+          medida_caseira_padrao, peso_medida_g
+        ) VALUES (
+          ${alimento.nome}, ${alimento.categoria || 'Geral'}, 
+          ${alimento.calorias_100g}, ${alimento.proteinas_100g || 0}, 
+          ${alimento.carboidratos_100g || 0}, ${alimento.gorduras_100g || 0}, 
+          ${alimento.fibras_100g || 0}, ${alimento.medida_caseira_padrao || null}, 
+          ${alimento.peso_medida_g || 100}
+        ) RETURNING *
+      `;
+      return rows[0];
+    });
+  } catch (err) {
+    console.error('Erro ao salvar alimento:', err);
+    throw err;
+  }
+}
+

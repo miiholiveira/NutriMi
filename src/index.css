@@ -10,6 +10,7 @@
 }
 
 :root {
+  color-scheme: dark;
   /* Paleta principal */
   --royal-blue:        #1e3a8a;
   --royal-blue-light:  #3b82f6;
@@ -79,42 +80,49 @@ body {
   flex-direction: column;
 }
 
-/* ---- Auth Layout with Health Background Image ---- */
+/* ---- Auth Layout with Fullscreen Image & Harmonious Gradient ---- */
 .auth-page {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: #090d16;
-}
-
-.auth-panel {
   position: relative;
-  background-color: #090d16;
+  background-color: #0c1c44;
   background-image: 
-    linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.78) 50%, rgba(136, 19, 55, 0.82) 100%),
+    linear-gradient(145deg, rgba(13, 30, 72, 0.78) 0%, rgba(23, 53, 119, 0.70) 30%, rgba(59, 26, 90, 0.72) 65%, rgba(133, 15, 51, 0.78) 100%),
     url('/images/bg-health.jpg');
   background-size: cover;
-  background-position: center bottom;
+  background-position: center center;
   background-repeat: no-repeat;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
   overflow: hidden;
 }
 
-.auth-panel::before {
+/* Brilhos sutis globais que integram toda a tela */
+.auth-page::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.2) 0%, transparent 65%),
-              radial-gradient(circle at 80% 80%, rgba(190, 18, 60, 0.25) 0%, transparent 65%);
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 90% 15%, rgba(59, 130, 246, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 90% 85%, rgba(225, 29, 72, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(136, 19, 55, 0.2) 0%, transparent 60%);
   pointer-events: none;
   z-index: 1;
+}
+
+/* Painel esquerdo */
+.auth-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  overflow: hidden;
+  z-index: 2;
 }
 
 .auth-panel-content {
@@ -144,34 +152,103 @@ body {
 .auth-panel-features {
   position: relative;
   z-index: 2;
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
   width: 100%;
-  max-width: 360px;
+  max-width: 390px;
 }
 
 .auth-feature-item {
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  font-size: 0.92rem;
-  font-weight: 500;
+  flex-direction: column;
   color: var(--white);
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.65rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.75rem 1.1rem;
   border-radius: var(--radius-md);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  transition: all var(--transition-fast);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
+  outline: none;
 }
 
 .auth-feature-item:hover {
   background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateX(4px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35), 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.auth-feature-item:focus-visible {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4);
+}
+
+.auth-feature-item.active {
+  background: rgba(30, 58, 138, 0.45);
+  border-color: rgba(147, 197, 253, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(59, 130, 246, 0.3);
+  transform: translateX(4px);
+}
+
+.auth-feature-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.auth-feature-header .feature-title {
+  font-size: 0.93rem;
+  font-weight: 600;
+  flex: 1;
+  letter-spacing: -0.2px;
+}
+
+.auth-feature-chevron {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-feature-item:hover .auth-feature-chevron {
+  opacity: 1;
+}
+
+.auth-feature-item.active .auth-feature-chevron {
+  transform: rotate(180deg);
+  opacity: 1;
+  color: #93c5fd;
+}
+
+.auth-feature-desc {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #e2e8f0;
+  animation: featureFadeIn 0.25s ease forwards;
+}
+
+@keyframes featureFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .auth-feature-item .feature-icon {
@@ -194,33 +271,30 @@ body {
   justify-content: center;
   align-items: center;
   padding: 3rem 1.5rem;
-  background-color: #080c14;
-  background-image: 
-    radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.35) 0%, transparent 55%),
-    radial-gradient(circle at 85% 90%, rgba(159, 18, 57, 0.30) 0%, transparent 55%);
-  background-repeat: no-repeat;
+  background: transparent;
   overflow: hidden;
+  z-index: 2;
 }
 
 /* Ambient Glow Lights Decorativos */
 .auth-glow-blue {
   position: absolute;
-  top: -60px;
+  top: -80px;
   right: -60px;
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.45) 0%, rgba(29, 78, 216, 0.15) 50%, transparent 70%);
-  filter: blur(70px);
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(30, 58, 138, 0.15) 50%, transparent 70%);
+  filter: blur(80px);
   pointer-events: none;
   z-index: 1;
 }
 
 .auth-glow-burgundy {
   position: absolute;
-  bottom: -40px;
-  right: 20px;
-  width: 420px;
-  height: 420px;
+  bottom: -60px;
+  right: -20px;
+  width: 480px;
+  height: 480px;
   background: radial-gradient(circle, rgba(225, 29, 72, 0.35) 0%, rgba(159, 18, 57, 0.15) 50%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
@@ -233,12 +307,12 @@ body {
   width: 100%;
   max-width: 440px;
   padding: 2.5rem 2.25rem;
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.45), 0 0 35px rgba(59, 130, 246, 0.15);
 }
 
 /* Botão Alternar Mostrar/Ocultar Senha com Emoji Animado */
@@ -345,7 +419,7 @@ body {
   color: var(--gray-300);
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input, .form-select, .form-textarea, select {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1.5px solid rgba(255, 255, 255, 0.1);
@@ -353,9 +427,36 @@ body {
   font-size: 0.95rem;
   font-family: var(--font-family);
   color: var(--white);
-  background: rgba(255, 255, 255, 0.05);
+  background-color: #0f172a;
+  color-scheme: dark;
   transition: all var(--transition-fast);
   outline: none;
+}
+
+.form-select, select {
+  background-color: #0f172a;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.form-select option,
+select option,
+optgroup,
+.form-input option {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+.form-select option:hover,
+.form-select option:focus,
+.form-select option:checked,
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #1e3a8a !important;
+  color: #ffffff !important;
 }
 
 .form-textarea {
@@ -363,14 +464,14 @@ body {
   min-height: 90px;
 }
 
-.form-input:hover, .form-select:hover, .form-textarea:hover {
+.form-input:hover, .form-select:hover, .form-textarea:hover, select:hover {
   border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.07);
+  background-color: #111e38;
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
+.form-input:focus, .form-select:focus, .form-textarea:focus, select:focus {
   border-color: #3b82f6;
-  background: rgba(255, 255, 255, 0.08);
+  background-color: #111e38;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 

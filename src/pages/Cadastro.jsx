@@ -3,6 +3,29 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authClient } from '../lib/auth';
 import { saveNutricionista } from '../lib/db';
 
+const CADASTRO_FEATURES = [
+  {
+    icon: '✅',
+    label: 'Cadastro gratuito e sem burocracia',
+    desc: 'Crie sua conta profissional em menos de 1 minuto e tenha acesso imediato a todas as ferramentas essenciais.',
+  },
+  {
+    icon: '🔒',
+    label: 'Seus dados protegidos com segurança',
+    desc: 'Prontuários e informações de saúde armazenados com criptografia e máxima conformidade de privacidade.',
+  },
+  {
+    icon: '🚀',
+    label: 'Pronto para usar imediatamente',
+    desc: 'Sem instalações complexas. Funciona 100% no seu navegador em qualquer computador ou dispositivo móvel.',
+  },
+  {
+    icon: '💡',
+    label: 'Interface intuitiva e moderna',
+    desc: 'Design fluido e agradável feito para otimizar suas consultas e encantar seus pacientes em cada atendimento.',
+  },
+];
+
 export default function Cadastro({ onSuccess }) {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
@@ -15,6 +38,7 @@ export default function Cadastro({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
+  const [expandedFeature, setExpandedFeature] = useState(null);
 
   function clearErrors() {
     setErro('');
@@ -115,22 +139,35 @@ export default function Cadastro({ onSuccess }) {
         </div>
 
         <div className="auth-panel-features">
-          <div className="auth-feature-item">
-            <div className="feature-icon">✅</div>
-            <span>Cadastro gratuito e sem burocracia</span>
-          </div>
-          <div className="auth-feature-item">
-            <div className="feature-icon">🔒</div>
-            <span>Seus dados protegidos com segurança</span>
-          </div>
-          <div className="auth-feature-item">
-            <div className="feature-icon">🚀</div>
-            <span>Pronto para usar imediatamente</span>
-          </div>
-          <div className="auth-feature-item">
-            <div className="feature-icon">💡</div>
-            <span>Interface intuitiva e moderna</span>
-          </div>
+          {CADASTRO_FEATURES.map((f, idx) => {
+            const isExpanded = expandedFeature === idx;
+            return (
+              <div
+                className={`auth-feature-item${isExpanded ? ' active' : ''}`}
+                key={f.label}
+                onClick={() => setExpandedFeature(isExpanded ? null : idx)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setExpandedFeature(isExpanded ? null : idx);
+                  }
+                }}
+              >
+                <div className="auth-feature-header">
+                  <div className="feature-icon">{f.icon}</div>
+                  <span className="feature-title">{f.label}</span>
+                  <span className="auth-feature-chevron">▼</span>
+                </div>
+                {isExpanded && (
+                  <div className="auth-feature-desc">
+                    {f.desc}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

@@ -144,3 +144,35 @@ export function calcularTMB(pesoKg, alturaCmOrM, idade = 30, sexo = 'Feminino', 
     fator
   };
 }
+
+/**
+ * Cálculo do Consumo Hídrico Diário Ideal
+ * Base clínica recomendada: 35ml por kg de peso corporal
+ */
+export function calcularConsumoAgua(pesoKg, nivelAtividade = 'Leve') {
+  const peso = parseFloat(pesoKg) || 70;
+  
+  let mlPorKg = 35;
+  const niv = String(nivelAtividade).toLowerCase();
+  if (niv.includes('intens') || niv.includes('alto')) {
+    mlPorKg = 40;
+  } else if (niv.includes('moderat')) {
+    mlPorKg = 38;
+  }
+
+  const mlTotal = Math.round(peso * mlPorKg);
+  const litrosTotal = (mlTotal / 1000).toFixed(1);
+  const copos250ml = Math.round(mlTotal / 250);
+  const garrafas500ml = (mlTotal / 500).toFixed(1);
+
+  return {
+    mlTotal,
+    litrosTotal: parseFloat(litrosTotal),
+    litrosFormatado: `${litrosTotal} L`,
+    copos250ml,
+    garrafas500ml,
+    mlPorKg,
+    recomendacao: `${litrosTotal}L por dia (~${mlTotal.toLocaleString('pt-BR')} ml)`
+  };
+}
+

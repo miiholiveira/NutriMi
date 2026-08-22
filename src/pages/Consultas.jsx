@@ -195,11 +195,11 @@ export default function Consultas({ nutricionista }) {
           <div style={{ display: 'flex', gap: '2rem', fontSize: '0.9rem' }}>
             <div>
               <span style={{ color: 'var(--gray-400)' }}>Altura: </span>
-              <strong style={{ color: 'var(--gray-800)' }}>{selectedPaciente.altura ? `${selectedPaciente.altura} m` : '—'}</strong>
+              <strong style={{ color: 'var(--white)' }}>{selectedPaciente.altura ? `${selectedPaciente.altura} m` : '—'}</strong>
             </div>
             <div>
               <span style={{ color: 'var(--gray-400)' }}>Peso Inicial: </span>
-              <strong style={{ color: 'var(--gray-800)' }}>{selectedPaciente.peso_inicial ? `${selectedPaciente.peso_inicial} kg` : '—'}</strong>
+              <strong style={{ color: 'var(--white)' }}>{selectedPaciente.peso_inicial ? `${selectedPaciente.peso_inicial} kg` : '—'}</strong>
             </div>
           </div>
         )}
@@ -207,7 +207,7 @@ export default function Consultas({ nutricionista }) {
 
       <div className="card-table">
         <div className="table-header-bar">
-          <h3 style={{ color: 'var(--gray-800)', fontSize: '1rem', fontWeight: 700 }}>Histórico de Consultas</h3>
+          <h3 style={{ color: 'var(--white)', fontSize: '1rem', fontWeight: 700 }}>Histórico de Consultas</h3>
         </div>
 
         {loadingConsultas ? (

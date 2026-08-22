@@ -4,10 +4,26 @@ import { authClient } from '../lib/auth';
 import Modal from '../components/Modal';
 
 const FEATURES = [
-  { icon: '🥗', label: 'Planos alimentares personalizados' },
-  { icon: '👥', label: 'Gestão completa de pacientes' },
-  { icon: '📅', label: 'Agendamento de consultas' },
-  { icon: '📊', label: 'Relatórios nutricionais' },
+  {
+    icon: '🥗',
+    label: 'Planos alimentares personalizados',
+    desc: 'Crie dietas sob medida com cálculo automático de calorias, distribuição de macronutrientes e cardápios completos para cada objetivo do paciente.',
+  },
+  {
+    icon: '👥',
+    label: 'Gestão completa de pacientes',
+    desc: 'Acompanhe histórico clínico, anamnese, evolução antropométrica, metas e preferências em um prontuário eletrônico unificado.',
+  },
+  {
+    icon: '📅',
+    label: 'Agendamento de consultas',
+    desc: 'Organize sua agenda com facilidade, programe retornos periódicos e mantenha o acompanhamento nutricional sempre em dia.',
+  },
+  {
+    icon: '📊',
+    label: 'Relatórios nutricionais',
+    desc: 'Gere gráficos de progresso corporal, evolução de medidas e exporte planos alimentares profissionais prontos para impressão ou PDF.',
+  },
 ];
 
 export default function Login({ onSuccess }) {
@@ -17,6 +33,7 @@ export default function Login({ onSuccess }) {
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+  const [expandedFeature, setExpandedFeature] = useState(null);
 
   // Modal Esqueci minha senha
   const [resetModalOpen, setResetModalOpen] = useState(false);
@@ -105,12 +122,35 @@ export default function Login({ onSuccess }) {
         </div>
 
         <div className="auth-panel-features">
-          {FEATURES.map((f) => (
-            <div className="auth-feature-item" key={f.label}>
-              <div className="feature-icon">{f.icon}</div>
-              <span>{f.label}</span>
-            </div>
-          ))}
+          {FEATURES.map((f, idx) => {
+            const isExpanded = expandedFeature === idx;
+            return (
+              <div
+                className={`auth-feature-item${isExpanded ? ' active' : ''}`}
+                key={f.label}
+                onClick={() => setExpandedFeature(isExpanded ? null : idx)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setExpandedFeature(isExpanded ? null : idx);
+                  }
+                }}
+              >
+                <div className="auth-feature-header">
+                  <div className="feature-icon">{f.icon}</div>
+                  <span className="feature-title">{f.label}</span>
+                  <span className="auth-feature-chevron">▼</span>
+                </div>
+                {isExpanded && (
+                  <div className="auth-feature-desc">
+                    {f.desc}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
