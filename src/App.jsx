@@ -11,6 +11,7 @@ import Pacientes from './pages/Pacientes';
 import Consultas from './pages/Consultas';
 import Planos from './pages/Planos';
 import Relatorios from './pages/Relatorios';
+import PwaInstallPrompt from './components/PwaInstallPrompt';
 
 function AuthGuard({ session, loading, children }) {
   if (loading) {
@@ -103,53 +104,58 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicGuard session={session} loading={loading}>
-            <Login onSuccess={handleAuthSuccess} />
-          </PublicGuard>
-        }
-      />
-      <Route
-        path="/cadastro"
-        element={
-          <PublicGuard session={session} loading={loading}>
-            <Cadastro onSuccess={handleAuthSuccess} />
-          </PublicGuard>
-        }
-      />
-      <Route
-        path="/reset-senha"
-        element={
-          <PublicGuard session={session} loading={loading}>
-            <ResetSenha />
-          </PublicGuard>
-        }
-      />
-      
-      {/* Rotas protegidas sob Layout */}
-      <Route
-        path="/dashboard/*"
-        element={
-          <AuthGuard session={session} loading={loading}>
-            <DashboardLayout session={session} nutricionista={nutricionista} onLogout={handleLogout}>
-              <Routes>
-                <Route index element={<DashboardHome session={session} nutricionista={nutricionista} />} />
-                <Route path="pacientes" element={<Pacientes nutricionista={nutricionista} />} />
-                <Route path="consultas" element={<Consultas nutricionista={nutricionista} />} />
-                <Route path="planos" element={<Planos nutricionista={nutricionista} />} />
-                <Route path="relatorios" element={<Relatorios nutricionista={nutricionista} />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </DashboardLayout>
-          </AuthGuard>
-        }
-      />
+    <>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicGuard session={session} loading={loading}>
+              <Login onSuccess={handleAuthSuccess} />
+            </PublicGuard>
+          }
+        />
+        <Route
+          path="/cadastro"
+          element={
+            <PublicGuard session={session} loading={loading}>
+              <Cadastro onSuccess={handleAuthSuccess} />
+            </PublicGuard>
+          }
+        />
+        <Route
+          path="/reset-senha"
+          element={
+            <PublicGuard session={session} loading={loading}>
+              <ResetSenha />
+            </PublicGuard>
+          }
+        />
+        
+        {/* Rotas protegidas sob Layout */}
+        <Route
+          path="/dashboard/*"
+          element={
+            <AuthGuard session={session} loading={loading}>
+              <DashboardLayout session={session} nutricionista={nutricionista} onLogout={handleLogout}>
+                <Routes>
+                  <Route index element={<DashboardHome session={session} nutricionista={nutricionista} />} />
+                  <Route path="pacientes" element={<Pacientes nutricionista={nutricionista} />} />
+                  <Route path="consultas" element={<Consultas nutricionista={nutricionista} />} />
+                  <Route path="planos" element={<Planos nutricionista={nutricionista} />} />
+                  <Route path="relatorios" element={<Relatorios nutricionista={nutricionista} />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </DashboardLayout>
+            </AuthGuard>
+          }
+        />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+
+      {/* Banner / Prompt de Instalação PWA */}
+      <PwaInstallPrompt />
+    </>
   );
 }

@@ -1,0 +1,72 @@
+{
+  "name": "NutriMi — Gestão Nutricional Inteligente",
+  "short_name": "NutriMi",
+  "description": "Sistema completo de acompanhamento, cálculos de saúde e prescrição de dietas e treinos personalizados.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait-primary",
+  "categories": ["health", "fitness", "lifestyle", "productivity", "medical"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo Paciente",
+      "short_name": "Pacientes",
+      "description": "Cadastre ou acesse a ficha do paciente",
+      "url": "/pacientes",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Planos Alimentares",
+      "short_name": "Planos",
+      "description": "Gerador de dietas e treinos de 7 dias",
+      "url": "/planos",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Consultas & Evolução",
+      "short_name": "Consultas",
+      "description": "Registre medidas e evolução corporal",
+      "url": "/consultas",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Relatórios Nutricionais",
+      "short_name": "Relatórios",
+      "description": "Visualize gráficos e metas",
+      "url": "/relatorios",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}
