@@ -357,6 +357,23 @@ body {
   transform: translateY(-50%) scale(1.35);
 }
 
+.auth-link-forgot {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-link-forgot:hover {
+  color: #bfdbfe;
+  text-decoration: underline;
+}
+
 /* Símbolo sempre pequeno no topo esquerdo */
 .auth-logo {
   display: flex;
@@ -578,6 +595,11 @@ select option:checked {
   z-index: 10;
 }
 
+/* ---- Mobile Top Header (Oculto em Desktop) ---- */
+.mobile-top-header {
+  display: none;
+}
+
 .sidebar-header {
   padding: 1.5rem 1.25rem;
   display: flex;
@@ -625,6 +647,17 @@ select option:checked {
   font-weight: 500;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
+}
+
+.sidebar-item-icon {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-item-label {
+  font-size: 0.9rem;
 }
 
 .sidebar-menu-item:hover {
@@ -1386,6 +1419,302 @@ select option:checked {
   font-size: 0.88rem;
   color: var(--success);
   font-weight: 600;
+}
+
+/* =============================================
+   RESPONSIVIDADE & LAYOUT MOBILE (PWA / SMARTPHONE)
+   ============================================= */
+
+/* Tablets e Dispositivos Médios (<= 960px) */
+@media (max-width: 960px) {
+  /* Auth / Login / Cadastro */
+  .auth-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+    overflow-y: auto;
+  }
+
+  .auth-panel {
+    display: none; /* Oculta a coluna lateral duplicada para dar espaço total e foco ao formulário */
+  }
+
+  .auth-form-panel {
+    width: 100%;
+    max-width: 440px;
+    padding: 0;
+    margin: auto 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .auth-form-wrapper {
+    width: 100%;
+    max-width: 100%;
+    padding: 2rem 1.35rem;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(59, 130, 246, 0.2);
+  }
+
+  .auth-glow-blue,
+  .auth-glow-burgundy {
+    width: 320px;
+    height: 320px;
+    opacity: 0.6;
+  }
+}
+
+/* Smartphones e Telas Pequenas (<= 768px) */
+@media (max-width: 768px) {
+  /* Layout Geral do App */
+  .app-container {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Barra de Topo no Mobile */
+  .mobile-top-header {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;
+    padding: 0 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mobile-logo-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px;
+  }
+
+  .mobile-logo-text {
+    font-size: 1.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--royal-blue-light), var(--burgundy-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .mobile-user-greeting {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray-300);
+  }
+
+  .mobile-btn-logout {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    color: #fda4af;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Bottom Navigation Bar no Mobile */
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 999;
+    flex-direction: row;
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .sidebar-header,
+  .sidebar-footer {
+    display: none !important;
+  }
+
+  .sidebar-menu {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 0.25rem;
+    width: 100%;
+    height: 100%;
+    gap: 0;
+  }
+
+  .sidebar-menu-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 2px;
+    font-size: 0.65rem;
+    border-radius: 8px;
+    flex: 1;
+    height: 100%;
+    color: var(--gray-400);
+  }
+
+  .sidebar-menu-item.active {
+    background: rgba(190, 18, 60, 0.2);
+    color: #ffffff;
+    border-bottom: 2px solid var(--burgundy-light);
+    border-radius: 4px;
+  }
+
+  .sidebar-item-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .sidebar-item-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Conteúdo Principal no Mobile */
+  .main-content {
+    height: auto;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .main-content-scroll {
+    padding: 1rem 0.85rem;
+    padding-top: 4.5rem; /* Espaço para o top header */
+    padding-bottom: 5.5rem; /* Espaço para o bottom nav */
+    overflow-x: hidden;
+  }
+
+  /* Dashboard Grid no Mobile */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .metric-card {
+    padding: 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .metric-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .metric-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .metric-info p {
+    font-size: 0.72rem;
+  }
+
+  /* Cabeçalhos de Página */
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .page-title h1 {
+    font-size: 1.35rem;
+  }
+
+  .page-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .page-actions button,
+  .page-actions .btn-primary,
+  .page-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tabelas Responsivas com Scroll Horizontal Suave */
+  .card-table {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .custom-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* Modais no Mobile */
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+
+  .modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0;
+    max-height: 90vh;
+    border-radius: 16px;
+  }
+
+  /* Formulários no Mobile */
+  .form-grid-2,
+  .form-grid-3,
+  .form-grid-4 {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 1rem !important; /* Previne zoom automático indesejado no iOS Safari */
+  }
+
+  /* Botão Toggle de Senha */
+  .toggle-password-btn {
+    right: 0.75rem;
+    font-size: 1.3rem;
+    padding: 0.35rem;
+  }
 }
 
 /* =============================================

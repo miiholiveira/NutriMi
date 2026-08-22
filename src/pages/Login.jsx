@@ -197,8 +197,8 @@ export default function Login({ onSuccess }) {
             </div>
 
             <div className="form-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label className="form-label" htmlFor="login-senha">Senha</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.35rem' }}>
+                <label className="form-label" htmlFor="login-senha" style={{ marginBottom: 0 }}>Senha</label>
                 <button
                   type="button"
                   className="auth-link-forgot"
