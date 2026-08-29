@@ -246,3 +246,152 @@ export function calcularConsumoAgua(pesoKg, nivelAtividade = 'Leve') {
   };
 }
 
+/**
+ * Classificação Clínica do Percentual de Gordura (ACSM / Jackson & Pollock)
+ */
+export function classificarPercentualGordura(percentual, sexo = 'Feminino') {
+  const p = parseFloat(percentual);
+  if (isNaN(p) || p <= 0) return null;
+
+  const isFeminino = String(sexo).toLowerCase().startsWith('f');
+
+  if (isFeminino) {
+    if (p < 14) return { label: 'Gordura Essencial', cor: '#38bdf8', badgeBg: 'rgba(56, 189, 248, 0.15)', badgeBorder: 'rgba(56, 189, 248, 0.35)', icone: '⚡' };
+    if (p <= 20) return { label: 'Atleta / Excelente', cor: '#34d399', badgeBg: 'rgba(52, 211, 153, 0.15)', badgeBorder: 'rgba(52, 211, 153, 0.35)', icone: '🏆' };
+    if (p <= 24) return { label: 'Fitness / Bom', cor: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.15)', badgeBorder: 'rgba(16, 185, 129, 0.35)', icone: '✨' };
+    if (p <= 31) return { label: 'Ideal / Aceitável', cor: '#60a5fa', badgeBg: 'rgba(96, 165, 250, 0.15)', badgeBorder: 'rgba(96, 165, 250, 0.35)', icone: '👍' };
+    return { label: 'Elevado / Atenção', cor: '#f43f5e', badgeBg: 'rgba(244, 63, 94, 0.15)', badgeBorder: 'rgba(244, 63, 94, 0.35)', icone: '⚠️' };
+  } else {
+    // Masculino
+    if (p < 6) return { label: 'Gordura Essencial', cor: '#38bdf8', badgeBg: 'rgba(56, 189, 248, 0.15)', badgeBorder: 'rgba(56, 189, 248, 0.35)', icone: '⚡' };
+    if (p <= 13) return { label: 'Atleta / Excelente', cor: '#34d399', badgeBg: 'rgba(52, 211, 153, 0.15)', badgeBorder: 'rgba(52, 211, 153, 0.35)', icone: '🏆' };
+    if (p <= 17) return { label: 'Fitness / Bom', cor: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.15)', badgeBorder: 'rgba(16, 185, 129, 0.35)', icone: '✨' };
+    if (p <= 24) return { label: 'Ideal / Aceitável', cor: '#60a5fa', badgeBg: 'rgba(96, 165, 250, 0.15)', badgeBorder: 'rgba(96, 165, 250, 0.35)', icone: '👍' };
+    return { label: 'Elevado / Atenção', cor: '#f43f5e', badgeBg: 'rgba(244, 63, 94, 0.15)', badgeBorder: 'rgba(244, 63, 94, 0.35)', icone: '⚠️' };
+  }
+}
+
+/**
+ * Calcula o Percentual de Gordura Corporal (%)
+ * Combina o padrão antropométrico U.S. Navy (Hodgdon-Beckett & Siri)
+ * com inclusão das circunferências de Busto/Tórax, Cintura e Quadril.
+ */
+export function calcularPercentualGordura({
+  sexo = 'Feminino',
+  altura,  // cm ou m
+  peso,    // kg
+  cintura, // cm
+  quadril, // cm
+  busto,   // cm (tórax/busto)
+  pescoco, // cm
+  idade = 30
+}) {
+  const pPeso = parseFloat(peso);
+  let pAltura = parseFloat(altura);
+  const pCintura = parseFloat(cintura);
+  const pQuadril = parseFloat(quadril);
+  const pBusto = parseFloat(busto);
+  let pPescoco = parseFloat(pescoco);
+  const pIdade = parseInt(idade, 10) || 30;
+
+  if (!pAltura || pAltura <= 0) return null;
+
+  // Normaliza altura para centímetros
+  const alturaCm = pAltura > 3 ? pAltura : pAltura * 100;
+  const alturaM = alturaCm / 100;
+  const isFeminino = String(sexo).toLowerCase().startsWith('f');
+
+  // 1. Método Antropométrico baseado em Circunferências (U.S. Navy / Siri + Busto)
+  if (pCintura && pCintura > 30) {
+    // Estimativa anatômica do pescoço caso não informado diretamente
+    if (!pPescoco || pPescoco <= 0) {
+      if (pBusto && pBusto > 40) {
+        pPescoco = isFeminino ? (pBusto * 0.36) : (pBusto * 0.40);
+      } else {
+        pPescoco = isFeminino ? (alturaCm * 0.22) : (alturaCm * 0.23);
+      }
+    }
+
+    if (isFeminino) {
+      // Para mulheres: Cintura, Quadril e Pescoço (com calibração de Busto)
+      const quad = pQuadril && pQuadril > 30 ? pQuadril : (pCintura * 1.25);
+      const circFator = (pCintura + quad) - pPescoco;
+
+      if (circFator > 0) {
+        // Densidade corporal de Siri / U.S. Navy
+        const densidade = 1.29579 - (0.35004 * Math.log10(circFator)) + (0.22100 * Math.log10(alturaCm));
+        let bf = (495 / densidade) - 450;
+
+        // Calibração sutil com Busto/Tórax se preenchido
+        if (pBusto && pBusto > 50) {
+          const ratioBusto = pBusto / quad;
+          bf += (ratioBusto - 0.92) * 2;
+        }
+
+        bf = Math.max(8, Math.min(58, bf));
+        const bfFinal = parseFloat(bf.toFixed(1));
+        const classif = classificarPercentualGordura(bfFinal, sexo);
+
+        return {
+          percentual: bfFinal,
+          classificacao: classif?.label || 'Ideal',
+          classifObj: classif,
+          metodo: 'Antropometria (Cintura, Quadril, Busto e Altura)',
+          massaGordaKg: pPeso ? parseFloat(((pPeso * bfFinal) / 100).toFixed(1)) : null,
+          massaMagraKg: pPeso ? parseFloat((pPeso - (pPeso * bfFinal) / 100).toFixed(1)) : null
+        };
+      }
+    } else {
+      // Para homens: Cintura e Pescoço (com calibração de Busto/Tórax)
+      const circFator = pCintura - pPescoco;
+
+      if (circFator > 0) {
+        const densidade = 1.0324 - (0.19077 * Math.log10(circFator)) + (0.15456 * Math.log10(alturaCm));
+        let bf = (495 / densidade) - 450;
+
+        if (pBusto && pBusto > 50) {
+          const ratioTorax = pBusto / pCintura;
+          if (ratioTorax > 1.15) {
+            bf -= (ratioTorax - 1.15) * 3;
+          }
+        }
+
+        bf = Math.max(4, Math.min(52, bf));
+        const bfFinal = parseFloat(bf.toFixed(1));
+        const classif = classificarPercentualGordura(bfFinal, sexo);
+
+        return {
+          percentual: bfFinal,
+          classificacao: classif?.label || 'Ideal',
+          classifObj: classif,
+          metodo: 'Antropometria (Cintura, Tórax e Altura)',
+          massaGordaKg: pPeso ? parseFloat(((pPeso * bfFinal) / 100).toFixed(1)) : null,
+          massaMagraKg: pPeso ? parseFloat((pPeso - (pPeso * bfFinal) / 100).toFixed(1)) : null
+        };
+      }
+    }
+  }
+
+  // 2. Fallback: Fórmula de Deurenberg (IMC, Idade e Sexo)
+  if (pPeso && pPeso > 0) {
+    const imc = pPeso / (alturaM * alturaM);
+    const sexoValor = isFeminino ? 0 : 1;
+    let bf = (1.20 * imc) + (0.23 * pIdade) - (10.8 * sexoValor) - 5.4;
+    bf = Math.max(5, Math.min(55, bf));
+    const bfFinal = parseFloat(bf.toFixed(1));
+    const classif = classificarPercentualGordura(bfFinal, sexo);
+
+    return {
+      percentual: bfFinal,
+      classificacao: classif?.label || 'Ideal',
+      classifObj: classif,
+      metodo: 'Estimativa Deurenberg (IMC & Idade)',
+      massaGordaKg: parseFloat(((pPeso * bfFinal) / 100).toFixed(1)),
+      massaMagraKg: parseFloat((pPeso - (pPeso * bfFinal) / 100).toFixed(1))
+    };
+  }
+
+  return null;
+}
+
+

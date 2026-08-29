@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getPacientes, getPlanos, savePlano, deletePlano } from '../lib/db';
 import { gerarPlanoAlimentar7Dias, estimarCaloriasOpcao } from '../utils/dietGenerator';
-import { gerarPlanoTreinos } from '../utils/workoutGenerator';
+import { gerarPlanoTreinos, criarTreinoMenstrualPadrao } from '../utils/workoutGenerator';
 import { BANCO_DE_ALIMENTOS, buscarAlimentos } from '../data/tabelaAlimentos';
 import { calcularIdade, obterClassificacaoEtaria } from '../utils/healthCalculators';
 import { converterPlanoIAparaDietPlan } from '../utils/aiDietConverter';
@@ -118,6 +118,12 @@ export default function Planos({ nutricionista }) {
 
         if (precisaRegenerar) {
           loadedWorkout = gerarPlanoTreinos(targetPac);
+        } else {
+          // Regra Clínica Obrigatória: Mulher não-criança SEMPRE possui treino menstrual
+          const isFemPac = String(targetPac.sexo || 'Feminino').toLowerCase().includes('fem');
+          if (isFemPac && idadePac > 12 && !loadedWorkout.treinoMenstrual) {
+            loadedWorkout.treinoMenstrual = criarTreinoMenstrualPadrao();
+          }
         }
 
         setWorkoutPlan(loadedWorkout);
@@ -296,7 +302,14 @@ export default function Planos({ nutricionista }) {
       setDietPlan(planoObj.conteudo.dietPlan);
     }
     if (planoObj.conteudo?.workoutPlan) {
-      setWorkoutPlan(planoObj.conteudo.workoutPlan);
+      let w = planoObj.conteudo.workoutPlan;
+      const target = selectedPaciente || pacientes.find(p => p.id === selectedPacienteId);
+      const isFem = String(target?.sexo || w.sexo || 'Feminino').toLowerCase().includes('fem');
+      const idad = target?.data_nascimento ? calcularIdade(target.data_nascimento) : 30;
+      if (isFem && idad > 12 && !w.treinoMenstrual) {
+        w = { ...w, treinoMenstrual: criarTreinoMenstrualPadrao() };
+      }
+      setWorkoutPlan(w);
     }
     setToast({
       type: 'info',
@@ -814,16 +827,16 @@ export default function Planos({ nutricionista }) {
 
       {/* Visualização de Impressão (PDF Header) */}
       <div className="print-only-header" style={{ display: 'none' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #1e3a8a', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #1e3a8a', paddingBottom: '0.6rem', marginBottom: '0.85rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', color: '#1e3a8a', margin: 0, fontWeight: 800 }}>NutriMi — Prescrição Nutricional</h1>
-            <p style={{ margin: 0, color: '#4b5563', fontSize: '0.9rem' }}>Acompanhamento & Cuidado Nutricional Personalizado</p>
+            <h1 style={{ fontSize: '1.6rem', color: '#1e3a8a', margin: 0, fontWeight: 800 }}>NutriMi — Prescrição Nutricional</h1>
+            <p style={{ margin: 0, color: '#4b5563', fontSize: '0.85rem' }}>Acompanhamento & Cuidado Nutricional Personalizado</p>
           </div>
           {selectedPaciente && (
-            <div style={{ textAlign: 'right', fontSize: '0.88rem', color: '#1f2937' }}>
+            <div style={{ textAlign: 'right', fontSize: '0.85rem', color: '#1f2937' }}>
               <strong>Paciente:</strong> {selectedPaciente.nome}<br />
-              <strong>Idade:</strong> {dietPlan?.pacienteInfo?.idade || '—'} anos | <strong>Sexo:</strong> {selectedPaciente.sexo}<br />
-              <strong>Peso:</strong> {selectedPaciente.peso_inicial || '—'} kg | <strong>Altura:</strong> {selectedPaciente.altura || '—'} m<br />
+              <strong>Idade:</strong> {selectedPaciente?.data_nascimento ? calcularIdade(selectedPaciente.data_nascimento) : (dietPlan?.pacienteInfo?.idade || '—')} anos | <strong>Sexo:</strong> {selectedPaciente.sexo}<br />
+              <strong>Peso:</strong> {selectedPaciente.peso_inicial || '—'} kg | <strong>Altura:</strong> {selectedPaciente.altura ? (parseFloat(selectedPaciente.altura) > 3 ? (parseFloat(selectedPaciente.altura) / 100).toFixed(2) : selectedPaciente.altura) + ' m' : '—'}<br />
               <strong>💧 Meta Hídrica:</strong> {dietPlan?.resumo?.consumoAgua?.recomendacao || ((parseFloat(selectedPaciente.peso_inicial || 70) * 35) / 1000).toFixed(1) + ' L/dia'}<br />
               <strong>Data da Prescrição:</strong> {new Date().toLocaleDateString('pt-BR')}
             </div>
@@ -903,7 +916,7 @@ export default function Planos({ nutricionista }) {
       ) : (
         <div className="plan-editor-container">
           {/* ABA 1: RESUMO NUTRICIONAL */}
-          {(activeTab === 'resumo' || window.matchMedia('print').matches) && (
+          {(activeTab === 'resumo') && (
             <div className="card-table" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1.1rem', color: 'var(--white)', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span>🎯</span> Metas de Calorias, Macronutrientes & Hidratação
@@ -947,7 +960,7 @@ export default function Planos({ nutricionista }) {
           {diasList.map((diaNome, diaIdx) => {
             const diaData = dietPlan.dias[diaIdx];
             if (!diaData) return null;
-            const isVisible = activeTab === diaNome || window.matchMedia('print').matches;
+            const isVisible = activeTab === diaNome;
             if (!isVisible) return null;
 
             return (
@@ -986,7 +999,7 @@ export default function Planos({ nutricionista }) {
                           <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Horário Sugerido:</span>
                           <input
                             type="text"
-                            className="form-input"
+                            className="form-input no-print"
                             style={{ width: '80px', padding: '0.25rem 0.5rem', fontSize: '0.85rem' }}
                             value={refeicao.horario}
                             onChange={(e) => {
@@ -995,6 +1008,9 @@ export default function Planos({ nutricionista }) {
                               setDietPlan({ ...dietPlan, dias: newDias });
                             }}
                           />
+                          <span className="print-only-text" style={{ display: 'none', fontWeight: 700, fontSize: '0.9rem', color: '#1f2937' }}>
+                            {refeicao.horario || '—'}
+                          </span>
                         </div>
                       </div>
 
@@ -1033,12 +1049,31 @@ export default function Planos({ nutricionista }) {
                               </div>
                               <input
                                 type="text"
-                                className="form-input"
+                                className="form-input no-print"
                                 value={opcaoText}
                                 onChange={(e) => handleOpcaoChange(diaIdx, refIdx, opIdx, e.target.value)}
                                 style={{ flex: 1, minWidth: '260px', fontSize: '0.9rem' }}
                                 placeholder="Descreva os alimentos da opção..."
                               />
+                              <div
+                                className="print-option-text"
+                                style={{
+                                  display: 'none',
+                                  flex: 1,
+                                  fontSize: '0.88rem',
+                                  color: '#111827',
+                                  fontWeight: 500,
+                                  lineHeight: '1.45',
+                                  wordBreak: 'break-word',
+                                  whiteSpace: 'normal',
+                                  padding: '0.35rem 0.6rem',
+                                  background: '#f9fafb',
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '6px'
+                                }}
+                              >
+                                {opcaoText}
+                              </div>
                               {refeicao.opcoes.length > 1 && (
                                 <button
                                   type="button"
@@ -1080,17 +1115,19 @@ export default function Planos({ nutricionista }) {
           })}
 
           {/* ABA DE TREINOS SEMANAIS */}
-          {(activeTab === 'treinos' || window.matchMedia('print').matches) && workoutPlan && (() => {
+          {(activeTab === 'treinos') && workoutPlan && (() => {
             const currentPac = selectedPaciente || pacientes.find(p => p.id === selectedPacienteId);
             const idadePaciente = currentPac?.data_nascimento ? calcularIdade(currentPac.data_nascimento) : (workoutPlan.idade || 30);
             const faixaEtaria = obterClassificacaoEtaria(idadePaciente);
-            const isCrianca = faixaEtaria.tipo === 'crianca';
+            const isCrianca = faixaEtaria.tipo === 'crianca' || idadePaciente <= 12;
             const isAdolescente = faixaEtaria.tipo === 'adolescente';
             const isAdulto = faixaEtaria.tipo === 'adulto';
             const isIdoso = faixaEtaria.tipo === 'idoso';
             const isFeminino = String(currentPac?.sexo || workoutPlan.sexo || 'Feminino').toLowerCase().includes('fem');
             const isMasculino = !isFeminino;
-            const hasMenstrual = Boolean(workoutPlan.treinoMenstrual && isFeminino);
+            // Regra Clínica: Sempre que for paciente mulher (exceto crianças), possui treino menstrual
+            const hasMenstrual = Boolean(isFeminino && !isCrianca);
+            const dadosMenstruais = workoutPlan.treinoMenstrual || (hasMenstrual ? criarTreinoMenstrualPadrao() : null);
 
             return (
               <div className="workout-plan-container" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
@@ -1132,6 +1169,28 @@ export default function Planos({ nutricionista }) {
                         }}>
                           {isFeminino ? '♀️ Sexo Feminino' : '♂️ Sexo Masculino'}
                         </span>
+
+                        {hasMenstrual && (
+                          <span
+                            onClick={() => setViewMenstrual(!viewMenstrual)}
+                            style={{
+                              background: 'rgba(219, 39, 119, 0.2)',
+                              border: '1px solid rgba(244, 114, 182, 0.5)',
+                              color: '#f472b6',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '8px',
+                              fontWeight: 700,
+                              fontSize: '0.82rem',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                            title="Clique para alternar para a adaptação de treino na fase menstrual"
+                          >
+                            🌸 Adaptação Menstrual Ativa
+                          </span>
+                        )}
 
                         {isCrianca && (
                           <span style={{ background: 'rgba(234, 179, 8, 0.15)', border: '1px solid rgba(234, 179, 8, 0.35)', color: '#fde047', padding: '0.25rem 0.65rem', borderRadius: '8px', fontWeight: 600, fontSize: '0.82rem' }}>
@@ -1281,8 +1340,8 @@ export default function Planos({ nutricionista }) {
                   ) : null}
                 </div>
 
-                {/* VISUALIZAÇÃO: PROTOCOLO & TREINO ADAPTADO PARA O PERÍODO MENSTRUAL (SE ATIVADO OU EM IMPRESSÃO) */}
-                {hasMenstrual && (viewMenstrual || window.matchMedia('print').matches) && (
+                {/* VISUALIZAÇÃO: PROTOCOLO & TREINO ADAPTADO PARA O PERÍODO MENSTRUAL */}
+                {hasMenstrual && dadosMenstruais && (viewMenstrual || window.matchMedia('print').matches) && (
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(136, 19, 55, 0.2) 0%, rgba(88, 28, 135, 0.2) 100%)',
                     border: '1.5px solid rgba(244, 114, 182, 0.4)',
@@ -1294,10 +1353,10 @@ export default function Planos({ nutricionista }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                       <div>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f472b6', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-                          <span>🌸</span> {workoutPlan.treinoMenstrual.titulo}
+                          <span>🌸</span> {dadosMenstruais.titulo}
                         </h3>
                         <p style={{ color: '#fbcfe8', fontSize: '0.88rem', margin: '0.35rem 0 0 0' }}>
-                          {workoutPlan.treinoMenstrual.subtitulo}
+                          {dadosMenstruais.subtitulo}
                         </p>
                       </div>
                       <span className="badge" style={{ background: 'rgba(219, 39, 119, 0.25)', color: '#fbcfe8', border: '1px solid rgba(219, 39, 119, 0.4)', fontSize: '0.82rem' }}>
@@ -1306,7 +1365,7 @@ export default function Planos({ nutricionista }) {
                     </div>
 
                     <p style={{ fontSize: '0.88rem', color: '#fce7f3', lineHeight: 1.6, background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '10px', marginBottom: '1.5rem' }}>
-                      {workoutPlan.treinoMenstrual.descricao}
+                      {dadosMenstruais.descricao}
                     </p>
 
                     {/* Guia das 4 Fases do Ciclo Hormonal */}
@@ -1315,7 +1374,7 @@ export default function Planos({ nutricionista }) {
                         <span>🩸</span> Como Treinar em Cada Fase do Ciclo Feminino:
                       </h4>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
-                        {workoutPlan.treinoMenstrual.fasesCiclo.map((fc, fcIdx) => (
+                        {dadosMenstruais.fasesCiclo.map((fc, fcIdx) => (
                           <div
                             key={fcIdx}
                             style={{
@@ -1342,7 +1401,7 @@ export default function Planos({ nutricionista }) {
 
                     {/* Tabelas de Treinos Menstruais Suaves */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      {workoutPlan.treinoMenstrual.rotina.map((tMenstrual, tmIdx) => (
+                      {dadosMenstruais.rotina.map((tMenstrual, tmIdx) => (
                         <div key={tmIdx} className="card-table" style={{ padding: '1.25rem', border: '1px solid rgba(244, 114, 182, 0.3)' }}>
                           <div style={{ marginBottom: '0.75rem' }}>
                             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#f472b6', margin: 0 }}>
@@ -1402,7 +1461,7 @@ export default function Planos({ nutricionista }) {
                     </div>
 
                     <div style={{ background: 'rgba(219, 39, 119, 0.12)', border: '1px solid rgba(219, 39, 119, 0.25)', padding: '1rem', borderRadius: '12px', fontSize: '0.86rem', color: '#fce7f3', marginTop: '1.25rem' }}>
-                      {workoutPlan.treinoMenstrual.orientacoesCuidados}
+                      {dadosMenstruais.orientacoesCuidados}
                     </div>
                   </div>
                 )}

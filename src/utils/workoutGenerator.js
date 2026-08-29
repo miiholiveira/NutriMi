@@ -10,6 +10,129 @@
 
 import { calcularIdade, obterClassificacaoEtaria } from './healthCalculators.js';
 
+/**
+ * Protocolo de Treino Adaptado para a Fase Menstrual
+ * Obrigatório para pacientes mulheres (exceto crianças).
+ */
+export function criarTreinoMenstrualPadrao() {
+  return {
+    titulo: '🌸 Protocolo & Treino Adaptado para o Período Menstrual',
+    subtitulo: 'Adaptação inteligente de intensidade e alívio de sintomas para os dias de sangramento e cólicas',
+    descricao: 'Durante a fase menstrual (dias 1 a 5 do ciclo), ocorre a queda brusca dos hormônios estrogênio e progesterona. O corpo apresenta menor tolerância à fadiga, aumento na percepção de esforço e eventual retenção hídrica/desconforto pélvico. A recomendação médica e esportiva é reduzir a carga em 30% a 50%, priorizar a mobilidade pélvica, exercícios de respiração e treinos regenerativos suaves que estimulam a liberação de endorfinas sem esgotar o organismo.',
+    fasesCiclo: [
+      {
+        fase: 'Fase Menstrual (Dias 1 a 5)',
+        status: 'Estrogênio e Progesterona Baixos',
+        energia: 'Baixa a Moderada',
+        treinoRecomendado: 'Treino Leve/Regenerativo: Caminhada plana, alongamento profundo, mobilidade de quadril e yoga suave. Evitar cargas máximas e pressão intra-abdominal excessiva.'
+      },
+      {
+        fase: 'Fase Folicular (Dias 6 a 12)',
+        status: 'Estrogênio em Elevação',
+        energia: 'Alta & Disposta',
+        treinoRecomendado: 'Excelente fase para treinos de força, hipertrofia progressiva e novas metas de carga. Recuperação muscular mais veloz.'
+      },
+      {
+        fase: 'Fase Ovulatória (Dias 13 a 16)',
+        status: 'Pico Máximo de Estrogênio & LH',
+        energia: 'Pico Máximo',
+        treinoRecomendado: 'Momento de força máxima e alto rendimento. Treinos intensos, recordes pessoais (PRs) e treinos complementares de luta/corrida.'
+      },
+      {
+        fase: 'Fase Lútea / TPM (Dias 17 a 28)',
+        status: 'Progesterona Elevada (Queda no final)',
+        energia: 'Moderada a Decrescente',
+        treinoRecomendado: 'Manter ritmo constante, moderado a leve. Priorizar hidratação (combate à retenção) e atividades como Pilates, Natação e caminhadas.'
+      }
+    ],
+    rotina: [
+      {
+        nome: 'Rotina Menstrual A — Alívio de Cólicas, Mobilidade Pélvica & Lombar',
+        foco: 'Relaxamento da fáscia pélvica, alívio de tensão lombar e circulação sanguínea sem impacto',
+        exercicios: [
+          {
+            exercicio: 'Alongamento Postura da Criança com Braços Estendidos (Balasana)',
+            series: 3,
+            repeticoes: '60 segundos mantendo respiração profunda',
+            descanso: '30s',
+            variacoes: ['Postura da Criança com joelhos afastados', 'Alongamento abraçando os dois joelhos no colchonete']
+          },
+          {
+            exercicio: 'Mobilidade Gato-Camelo no Colchonete (Cat-Cow)',
+            series: 3,
+            repeticoes: '10 a 12 ciclos respiratórios lentos',
+            descanso: '30s',
+            variacoes: ['Ondulação pélvica no solo', 'Báscula de quadril com bola suíça']
+          },
+          {
+            exercicio: 'Postura da Borboleta no Colchonete (Baddha Konasana)',
+            series: 3,
+            repeticoes: '45 a 60 segundos com tronco suavemente inclinado',
+            descanso: '30s',
+            variacoes: ['Borboleta deitada de costas', 'Abertura de quadril com apoio de almofada']
+          },
+          {
+            exercicio: 'Ponte para Glúteos no Solo (Sem Peso Adicional — Foco em Circulação)',
+            series: 3,
+            repeticoes: '10 a 12 repetições suaves',
+            descanso: '45s',
+            variacoes: ['Ponte isométrica sustentada 20s', 'Ponte com pés sobre a bola suíça']
+          },
+          {
+            exercicio: 'Caminhada Leve e Relaxante na Esteira Plana ou ao Ar Livre',
+            series: 1,
+            repeticoes: '20 a 30 minutos em ritmo confortável (sem inclinação)',
+            descanso: '—',
+            variacoes: ['Bicicleta ergométrica horizontal giro leve', 'Alongamento geral assistido', 'Yoga restaurativa']
+          }
+        ]
+      },
+      {
+        nome: 'Rotina Menstrual B — Musculação Regenerativa & Suave (Cargas 40-50% Reduzidas)',
+        foco: 'Manter a circulação e liberação de endorfinas sem gerar estresse inflamatório excessivo',
+        exercicios: [
+          {
+            exercicio: 'Senta e Levanta do Banco (Agachamento Guiado Leve sem Barra)',
+            series: 3,
+            repeticoes: '10-12 repetições lentas',
+            descanso: '60s',
+            variacoes: ['Agachamento com apoio na bola suíça na parede', 'Leg press horizontal com carga mínima']
+          },
+          {
+            exercicio: 'Puxada Frontal no Pulley (Carga 50% da habitual)',
+            series: 3,
+            repeticoes: '12 repetições sem falha',
+            descanso: '60s',
+            variacoes: ['Remada sentado na máquina com encosto confortável', 'Remada baixa com elástico']
+          },
+          {
+            exercicio: 'Elevação Lateral com Halteres Leves (1kg ou 2kg)',
+            series: 3,
+            repeticoes: '12 repetições controladas',
+            descanso: '45s',
+            variacoes: ['Elevação frontal suave', 'Rotação externa com elástico leve']
+          },
+          {
+            exercicio: 'Alongamento Guiado de Posteriores com Faixa Elástica',
+            series: 3,
+            repeticoes: '45 segundos por perna',
+            descanso: '30s',
+            variacoes: ['Alongamento em pé apoiado na parede', 'Alongamento sentado no solo com pernas estendidas']
+          },
+          {
+            exercicio: 'Respiração Diafragmática Profunda & Relaxamento Muscular Progressivo',
+            series: 1,
+            repeticoes: '5 a 10 minutos de olhos fechados',
+            descanso: '—',
+            variacoes: ['Meditação guiada de relaxamento', 'Banho morno relaxante pós-treino']
+          }
+        ]
+      }
+    ],
+    orientacoesCuidados: 'Dicas de Suporte no Período Menstrual: Aumente a ingestão de magnésio (sementes, banana, cacau 70%), consuma chás calmantes (camomila, gengibre para cólicas) e mantenha a hidratação generosa (35-40ml/kg). Escute os sinais do seu corpo: se as cólicas estiverem intensas no primeiro ou segundo dia, um dia completo de repouso é totalmente válido e faz parte do equilíbrio biológico.'
+  };
+}
+
 export function gerarPlanoTreinos(paciente) {
   const idade = calcularIdade(paciente?.data_nascimento);
   const sexo = paciente?.sexo || 'Feminino';
@@ -35,7 +158,10 @@ export function gerarPlanoTreinos(paciente) {
   let modalidadeComplementar = '';
   let rotina = [];
   let observacoes = '';
-  let treinoMenstrual = null;
+
+  // Regra Clínica Obrigatória: SEMPRE que for paciente mulher (exceto crianças),
+  // a opção e protocolo de treino adaptado para a fase menstrual é garantido.
+  let treinoMenstrual = (isFeminino && !isCrianca) ? criarTreinoMenstrualPadrao() : null;
 
   // =========================================================================
   // 1. FAIXA ETÁRIA: CRIANÇA (0 A 12 ANOS)
@@ -593,122 +719,7 @@ export function gerarPlanoTreinos(paciente) {
       ];
 
       // PROTOCOLO DEDICADO PARA O PERÍODO MENSTRUAL (MULHERES)
-      treinoMenstrual = {
-        titulo: '🌸 Protocolo & Treino Adaptado para o Período Menstrual',
-        subtitulo: 'Adaptação inteligente de intensidade e alívio de sintomas para os dias de sangramento e cólicas',
-        descricao: 'Durante a fase menstrual (dias 1 a 5 do ciclo), ocorre a queda brusca dos hormônios estrogênio e progesterona. O corpo apresenta menor tolerância à fadiga, aumento na percepção de esforço e eventual retenção hídrica/desconforto pélvico. A recomendação médica e esportiva é reduzir a carga em 30% a 50%, priorizar a mobilidade pélvica, exercícios de respiração e treinos regenerativos suaves que estimulam a liberação de endorfinas sem esgotar o organismo.',
-        fasesCiclo: [
-          {
-            fase: 'Fase Menstrual (Dias 1 a 5)',
-            status: 'Estrogênio e Progesterona Baixos',
-            energia: 'Baixa a Moderada',
-            treinoRecomendado: 'Treino Leve/Regenerativo: Caminhada plana, alongamento profundo, mobilidade de quadril e yoga suave. Evitar cargas máximas e pressão intra-abdominal excessiva.'
-          },
-          {
-            fase: 'Fase Folicular (Dias 6 a 12)',
-            status: 'Estrogênio em Elevação',
-            energia: 'Alta & Disposta',
-            treinoRecomendado: 'Excelente fase para treinos de força, hipertrofia progressiva e novas metas de carga. Recuperação muscular mais veloz.'
-          },
-          {
-            fase: 'Fase Ovulatória (Dias 13 a 16)',
-            status: 'Pico Máximo de Estrogênio & LH',
-            energia: 'Pico Máximo',
-            treinoRecomendado: 'Momento de força máxima e alto rendimento. Treinos intensos, recordes pessoais (PRs) e treinos complementares de luta/corrida.'
-          },
-          {
-            fase: 'Fase Lútea / TPM (Dias 17 a 28)',
-            status: 'Progesterona Elevada (Queda no final)',
-            energia: 'Moderada a Decrescente',
-            treinoRecomendado: 'Manter ritmo constante, moderado a leve. Priorizar hidratação (combate à retenção) e atividades como Pilates, Natação e caminhadas.'
-          }
-        ],
-        rotina: [
-          {
-            nome: 'Rotina Menstrual A — Alívio de Cólicas, Mobilidade Pélvica & Lombar',
-            foco: 'Relaxamento da fáscia pélvica, alívio de tensão lombar e circulação sanguínea sem impacto',
-            exercicios: [
-              {
-                exercicio: 'Alongamento Postura da Criança com Braços Estendidos (Balasana)',
-                series: 3,
-                repeticoes: '60 segundos mantendo respiração profunda',
-                descanso: '30s',
-                variacoes: ['Postura da Criança com joelhos afastados', 'Alongamento abraçando os dois joelhos no colchonete']
-              },
-              {
-                exercicio: 'Mobilidade Gato-Camelo no Colchonete (Cat-Cow)',
-                series: 3,
-                repeticoes: '10 a 12 ciclos respiratórios lentos',
-                descanso: '30s',
-                variacoes: ['Ondulação pélvica no solo', 'Báscula de quadril com bola suíça']
-              },
-              {
-                exercicio: 'Postura da Borboleta no Colchonete (Baddha Konasana)',
-                series: 3,
-                repeticoes: '45 a 60 segundos com tronco suavemente inclinado',
-                descanso: '30s',
-                variacoes: ['Borboleta deitada de costas', 'Abertura de quadril com apoio de almofada']
-              },
-              {
-                exercicio: 'Ponte para Glúteos no Solo (Sem Peso Adicional — Foco em Circulação)',
-                series: 3,
-                repeticoes: '10 a 12 repetições suaves',
-                descanso: '45s',
-                variacoes: ['Ponte isométrica sustentada 20s', 'Ponte com pés sobre a bola suíça']
-              },
-              {
-                exercicio: 'Caminhada Leve e Relaxante na Esteira Plana ou ao Ar Livre',
-                series: 1,
-                repeticoes: '20 a 30 minutos em ritmo confortável (sem inclinação)',
-                descanso: '—',
-                variacoes: ['Bicicleta ergométrica horizontal giro leve', 'Alongamento geral assistido', 'Yoga restaurativa']
-              }
-            ]
-          },
-          {
-            nome: 'Rotina Menstrual B — Musculação Regenerativa & Suave (Cargas 40-50% Reduzidas)',
-            foco: 'Manter a circulação e liberação de endorfinas sem gerar estresse inflamatório excessivo',
-            exercicios: [
-              {
-                exercicio: 'Senta e Levanta do Banco (Agachamento Guiado Leve sem Barra)',
-                series: 3,
-                repeticoes: '10-12 repetições lentas',
-                descanso: '60s',
-                variacoes: ['Agachamento com apoio na bola suíça na parede', 'Leg press horizontal com carga mínima']
-              },
-              {
-                exercicio: 'Puxada Frontal no Pulley (Carga 50% da habitual)',
-                series: 3,
-                repeticoes: '12 repetições sem falha',
-                descanso: '60s',
-                variacoes: ['Remada sentado na máquina com encosto confortável', 'Remada baixa com elástico']
-              },
-              {
-                exercicio: 'Elevação Lateral com Halteres Leves (1kg ou 2kg)',
-                series: 3,
-                repeticoes: '12 repetições controladas',
-                descanso: '45s',
-                variacoes: ['Elevação frontal suave', 'Rotação externa com elástico leve']
-              },
-              {
-                exercicio: 'Alongamento Guiado de Posteriores com Faixa Elástica',
-                series: 3,
-                repeticoes: '45 segundos por perna',
-                descanso: '30s',
-                variacoes: ['Alongamento em pé apoiado na parede', 'Alongamento sentado no solo com pernas estendidas']
-              },
-              {
-                exercicio: 'Respiração Diafragmática Profunda & Relaxamento Muscular Progressivo',
-                series: 1,
-                repeticoes: '5 a 10 minutos de olhos fechados',
-                descanso: '—',
-                variacoes: ['Meditação guiada de relaxamento', 'Banho morno relaxante pós-treino']
-              }
-            ]
-          }
-        ],
-        orientacoesCuidados: 'Dicas de Suporte no Período Menstrual: Aumente a ingestão de magnésio (sementes, banana, cacau 70%), consuma chás calmantes (camomila, gengibre para cólicas) e mantenha a hidratação generosa (35-40ml/kg). Escute os sinais do seu corpo: se as cólicas estiverem intensas no primeiro ou segundo dia, um dia completo de repouso é totalmente válido e faz parte do equilíbrio biológico.'
-      };
+      treinoMenstrual = criarTreinoMenstrualPadrao();
 
       observacoes = 'Protocolo Feminino: Musculação modeladora focada em inferiores e postura 3 a 5 vezes por semana combinada com 2 a 3 sessões de atividades complementares (Pilates, Dança ou Natação). Nos dias de menstruação ou cólica, utilize a rotina de treino leve regenerativo disponibilizada no plano.';
     }

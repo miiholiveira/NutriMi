@@ -201,10 +201,12 @@ export async function saveConsulta(data) {
       const rows = await sql`
         INSERT INTO consultas (
           paciente_id, data_consulta, peso, cintura, quadril, 
+          busto, braco, pescoco,
           percentual_gordura, observacoes, proximo_retorno
         ) VALUES (
           ${data.paciente_id}, ${data.data_consulta}, ${data.peso || null}, 
           ${data.cintura || null}, ${data.quadril || null}, 
+          ${data.busto || null}, ${data.braco || null}, ${data.pescoco || null},
           ${data.percentual_gordura || null}, ${data.observacoes || null}, 
           ${data.proximo_retorno || null}
         ) RETURNING *
@@ -226,6 +228,9 @@ export async function updateConsulta(id, data) {
           peso = ${data.peso || null},
           cintura = ${data.cintura || null},
           quadril = ${data.quadril || null},
+          busto = ${data.busto || null},
+          braco = ${data.braco || null},
+          pescoco = ${data.pescoco || null},
           percentual_gordura = ${data.percentual_gordura || null},
           observacoes = ${data.observacoes || null},
           proximo_retorno = ${data.proximo_retorno || null}

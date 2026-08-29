@@ -1767,43 +1767,107 @@ select option:checked {
     display: none !important;
   }
 
-  /* Exibir cabeçalho e rodapé específicos de impressão */
-  .print-only-header,
+  /* Exibir cabeçalho específico de impressão no topo */
+  .print-only-header {
+    display: block !important;
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid #1e3a8a !important;
+  }
+
   .print-only-footer {
     display: block !important;
   }
 
-  body, #root, .app-container, .main-content, .main-content-scroll {
+  .print-only-text {
+    display: inline !important;
+  }
+
+  /* Texto das opções de refeição que quebra linhas perfeitamente sem cortar */
+  .print-option-text {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    font-size: 0.88rem !important;
+    color: #111827 !important;
+    font-weight: 500 !important;
+    line-height: 1.45 !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 0.35rem 0.6rem !important;
+  }
+
+  body, #root, .app-container, .main-content, .main-content-scroll, .planos-page {
     background: #ffffff !important;
     color: #111827 !important;
     padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
     height: auto !important;
+    min-height: auto !important;
     width: 100% !important;
   }
 
-  .meal-card,
-  .card-table,
-  .day-meals-container,
-  .workout-plan-container {
+  /* Container da dieta DEVE começar na página 1 e fluir naturalmente sem forçar quebra antes */
+  .plan-editor-container,
+  .day-meals-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Cada refeição individual */
+  .meal-card {
     background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
     color: #111827 !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    margin-bottom: 1.25rem !important;
+    margin-bottom: 0.85rem !important;
+    padding: 0.75rem 1rem !important;
   }
 
-  .meal-title, .form-section-title, h1, h2, h3, h4 {
-    color: #1e3a8a !important;
-  }
-
-  .form-input {
-    background: #f9fafb !important;
+  .card-table,
+  .workout-plan-container {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
     color: #111827 !important;
-    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .form-section-title {
+    color: #1e3a8a !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.65rem !important;
+    padding-bottom: 0.35rem !important;
+    border-bottom: 1.5px solid #93c5fd !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .meal-header {
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding-bottom: 0.35rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .meal-title, h1, h2, h3, h4 {
+    color: #1e3a8a !important;
   }
 
   .custom-table th {

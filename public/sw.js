@@ -3,7 +3,7 @@
  * Gerencia cache offline e performance do aplicativo
  */
 
-const CACHE_NAME = 'nutrimi-pwa-v1';
+const CACHE_NAME = 'nutrimi-pwa-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
