@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPacientes, savePaciente, updatePaciente, deletePaciente } from '../lib/db';
-import { calcularIMC, calcularPesoIdeal } from '../utils/healthCalculators';
+import { calcularIMC, calcularPesoIdeal, calcularIdade, obterClassificacaoEtaria } from '../utils/healthCalculators';
 import Modal from '../components/Modal';
 
 export default function Pacientes({ nutricionista }) {
@@ -196,6 +196,8 @@ export default function Pacientes({ nutricionista }) {
   // Calculadora de saúde para o modal
   const imcLive = calcularIMC(form.peso_inicial, form.altura);
   const pesoIdealLive = calcularPesoIdeal(form.altura, form.sexo);
+  const idadeLive = form.data_nascimento ? calcularIdade(form.data_nascimento) : null;
+  const faixaEtariaLive = idadeLive !== null ? obterClassificacaoEtaria(idadeLive) : null;
 
   return (
     <div>
@@ -270,7 +272,30 @@ export default function Pacientes({ nutricionista }) {
                     const pi = calcularPesoIdeal(paciente.altura, paciente.sexo);
                     return (
                       <tr key={paciente.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--white)' }}>{paciente.nome}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--white)' }}>
+                          <div>{paciente.nome}</div>
+                          {paciente.data_nascimento && (() => {
+                            const id = calcularIdade(paciente.data_nascimento);
+                            const fx = obterClassificacaoEtaria(id);
+                            return (
+                              <span style={{
+                                background: fx.badgeCor,
+                                border: `1px solid ${fx.badgeBorder}`,
+                                color: fx.badgeTexto,
+                                borderRadius: '4px',
+                                padding: '0.12rem 0.45rem',
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                marginTop: '0.3rem'
+                              }}>
+                                {fx.icone} {id} {id === 1 ? 'ano' : 'anos'} • {fx.tipo === 'crianca' ? 'Criança' : (fx.tipo === 'adolescente' ? 'Adolescente' : (fx.tipo === 'idoso' ? 'Idoso' : 'Adulto'))}
+                              </span>
+                            );
+                          })()}
+                        </td>
                         <td>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
                             <span>{paciente.email || '—'}</span>
@@ -459,6 +484,29 @@ export default function Pacientes({ nutricionista }) {
                 value={form.data_nascimento}
                 onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })}
               />
+              {faixaEtariaLive && form.data_nascimento && (
+                <div style={{ marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', flexWrap: 'wrap' }}>
+                  <span style={{
+                    background: faixaEtariaLive.badgeCor,
+                    border: `1px solid ${faixaEtariaLive.badgeBorder}`,
+                    color: faixaEtariaLive.badgeTexto,
+                    borderRadius: '6px',
+                    padding: '0.18rem 0.5rem',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem'
+                  }}>
+                    {faixaEtariaLive.icone} {faixaEtariaLive.label} ({idadeLive} {idadeLive === 1 ? 'ano' : 'anos'})
+                  </span>
+                  <span style={{ color: 'var(--gray-300)', fontSize: '0.78rem' }}>
+                    {faixaEtariaLive.tipo === 'crianca' && '• Atividades físicas lúdicas & motoras (natação, judô, muay thai)'}
+                    {faixaEtariaLive.tipo === 'adolescente' && '• Calistenia e esportes complementares'}
+                    {faixaEtariaLive.tipo === 'adulto' && '• Musculação + Atividade física complementar'}
+                    {faixaEtariaLive.tipo === 'idoso' && '• Fortalecimento funcional & mobilidade articular'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

@@ -493,23 +493,29 @@ select option:checked {
 }
 
 /* Botões Clicáveis Premium com Gradiente da Marca (Azul a Bordô) */
+/* Botões Clicáveis Premium com Gradiente da Marca (Azul a Bordô) */
 .btn-primary {
-  width: 100%;
-  padding: 0.85rem 1.5rem;
+  width: auto;
+  padding: 0.6rem 1.15rem;
   background: linear-gradient(135deg, #1D4ED8 0%, #9F1239 100%);
   color: var(--white);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 600;
   font-family: var(--font-family);
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(29, 78, 216, 0.35);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   transition: all var(--transition-base);
+}
+
+.auth-form .btn-primary {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
 }
 
 .btn-primary:hover {
@@ -573,6 +579,29 @@ select option:checked {
   background: rgba(255, 255, 255, 0.12);
   color: var(--white);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Barra de Ações com Botões Lado a Lado Compactos */
+.page-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  width: auto !important;
+}
+
+.page-actions button,
+.page-actions .btn-primary,
+.page-actions .btn-secondary {
+  width: auto !important;
+  max-width: fit-content !important;
+  flex: 0 0 auto !important;
+  padding: 0.35rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  height: 32px !important;
+  white-space: nowrap !important;
+  border-radius: 8px !important;
 }
 
 /* ---- App Container (Sidebar lateral sempre à esquerda) ---- */
@@ -1656,16 +1685,22 @@ select option:checked {
 
   .page-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    width: auto;
   }
 
   .page-actions button,
   .page-actions .btn-primary,
   .page-actions .btn-secondary {
-    width: 100%;
+    width: auto;
+    flex: 0 1 auto;
     justify-content: center;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   /* Tabelas Responsivas com Scroll Horizontal Suave */

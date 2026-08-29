@@ -1427,7 +1427,7 @@ export function analisarOpcaoAlimentar(textoOpcao, fallbackKcal = 350) {
   }
 
   // Frutas por unidade (banana, maçã, kiwi, laranja, etc.)
-  const frutasRegex = /(\d+)\s*(banana|maç[ãa]|p[êe]ra|laranja|goiaba|kiwi)/gi;
+  const frutasRegex = /(\d+)\s*(banana|maç[ãa]|p[êe]ra|laranja|goiaba|kiwi|manga|abacate|lim[ãa]o|tangerina|mexerica)/gi;
   let fMatch;
   while ((fMatch = frutasRegex.exec(str)) !== null) {
     const qtd = parseInt(fMatch[1], 10);
@@ -1441,6 +1441,56 @@ export function analisarOpcaoAlimentar(textoOpcao, fallbackKcal = 350) {
       totalCarb += parseFloat(((ali.carboidratos_100g * gTotal) / 100).toFixed(1));
       totalGord += parseFloat(((ali.gorduras_100g * gTotal) / 100).toFixed(1));
       itensDetectados.push({ termo: `${qtd} ${termo}`, alimentoNome: ali.nome, gramas: gTotal, calorias: kcal });
+    }
+  }
+
+  // Fatias de Frutas (mamão, melancia, melão, abacaxi)
+  const fatiaFrutaRegex = /(\d+)\s*fatias?\s*(?:de\s+)?(mam[ãa]o|melancia|mel[ãa]o|abacaxi)/gi;
+  let ffMatch;
+  while ((ffMatch = fatiaFrutaRegex.exec(str)) !== null) {
+    const qtd = parseInt(ffMatch[1], 10);
+    const termo = ffMatch[2].toLowerCase();
+    const ali = BANCO_DE_ALIMENTOS.find((a) => normalizarTexto(a.sinonimos.join(' ')).includes(normalizarTexto(termo)));
+    if (ali && !itensDetectados.some((i) => i.alimentoNome === ali.nome)) {
+      const gTotal = qtd * (ali.peso_medida_g || 100); // ~100g por fatia média
+      const kcal = Math.round((ali.calorias_100g * gTotal) / 100);
+      totalKcal += kcal;
+      totalProt += parseFloat(((ali.proteinas_100g * gTotal) / 100).toFixed(1));
+      totalCarb += parseFloat(((ali.carboidratos_100g * gTotal) / 100).toFixed(1));
+      totalGord += parseFloat(((ali.gorduras_100g * gTotal) / 100).toFixed(1));
+      itensDetectados.push({ termo: `${qtd} fatia de ${termo}`, alimentoNome: ali.nome, gramas: gTotal, calorias: kcal });
+    }
+  }
+
+  // Colheres de Sopa (azeite, pasta de amendoim, chia, aveia, requeijão)
+  const colherRegex = /(\d+)\s*(?:colheres?|cs)\s*(?:de\s+sopa\s+)?(?:de\s+)?(azeite|pasta de amendoim|chia|aveia|requeij[ãa]o|mel)/gi;
+  let cMatch;
+  while ((cMatch = colherRegex.exec(str)) !== null) {
+    const qtd = parseInt(cMatch[1], 10);
+    const termo = cMatch[2].toLowerCase();
+    const ali = BANCO_DE_ALIMENTOS.find((a) => normalizarTexto(a.sinonimos.join(' ')).includes(normalizarTexto(termo)));
+    if (ali && !itensDetectados.some((i) => i.alimentoNome === ali.nome)) {
+      const gPorColher = termo.includes('azeite') ? 10 : (termo.includes('pasta') ? 15 : 15);
+      const gTotal = qtd * gPorColher;
+      const kcal = Math.round((ali.calorias_100g * gTotal) / 100);
+      totalKcal += kcal;
+      totalProt += parseFloat(((ali.proteinas_100g * gTotal) / 100).toFixed(1));
+      totalCarb += parseFloat(((ali.carboidratos_100g * gTotal) / 100).toFixed(1));
+      totalGord += parseFloat(((ali.gorduras_100g * gTotal) / 100).toFixed(1));
+      itensDetectados.push({ termo: `${qtd} colher de ${termo}`, alimentoNome: ali.nome, gramas: gTotal, calorias: kcal });
+    }
+  }
+
+  // Tapioca / Crepioca isolada (quando não especificado em gramas)
+  if (/(tapioca|crepioca)/i.test(str) && !itensDetectados.some(i => i.alimentoNome.includes('Mandioca') || i.termo.includes('tapioca'))) {
+    const ali = BANCO_DE_ALIMENTOS.find(a => a.id === 28); // Mandioca / Tapioca
+    if (ali) {
+      const gTotal = 60; // Padrão 3 colheres / 1 disco = ~60g
+      const kcal = Math.round((ali.calorias_100g * gTotal) / 100);
+      totalKcal += kcal;
+      totalProt += 1;
+      totalCarb += 35;
+      itensDetectados.push({ termo: 'disco de tapioca', alimentoNome: 'Tapioca / Goma', gramas: gTotal, calorias: kcal });
     }
   }
 

@@ -7,12 +7,82 @@ export function calcularIdade(dataNascimento) {
   if (!dataNascimento) return 30; // valor padrão para estimativa se não informado
   const hoje = new Date();
   const nasc = new Date(dataNascimento);
+  if (isNaN(nasc.getTime())) return 30;
+
   let idade = hoje.getFullYear() - nasc.getFullYear();
   const m = hoje.getMonth() - nasc.getMonth();
   if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
     idade--;
   }
-  return idade > 0 ? idade : 30;
+  return idade >= 0 ? idade : 30;
+}
+
+/**
+ * Classificação da Faixa Etária
+ * - Criança: 0 a 12 anos
+ * - Adolescente: 13 a 17 anos
+ * - Adulto: 18 a 59 anos
+ * - Idoso: 60+ anos
+ */
+export function obterClassificacaoEtaria(idade) {
+  const numIdade = typeof idade === 'number' ? idade : parseInt(idade, 10);
+  if (isNaN(numIdade)) {
+    return {
+      tipo: 'adulto',
+      label: 'Adulto',
+      faixa: '18 a 59 anos',
+      icone: '🧑',
+      badgeCor: 'rgba(59, 130, 246, 0.15)',
+      badgeBorder: 'rgba(59, 130, 246, 0.3)',
+      badgeTexto: '#60a5fa'
+    };
+  }
+
+  if (numIdade <= 12) {
+    return {
+      tipo: 'crianca',
+      label: 'Criança / Infantil',
+      faixa: '0 a 12 anos',
+      icone: '🧒',
+      badgeCor: 'rgba(234, 179, 8, 0.15)',
+      badgeBorder: 'rgba(234, 179, 8, 0.35)',
+      badgeTexto: '#facc15'
+    };
+  }
+
+  if (numIdade <= 17) {
+    return {
+      tipo: 'adolescente',
+      label: 'Adolescente / Jovem',
+      faixa: '13 a 17 anos',
+      icone: '👦',
+      badgeCor: 'rgba(168, 85, 247, 0.15)',
+      badgeBorder: 'rgba(168, 85, 247, 0.35)',
+      badgeTexto: '#c084fc'
+    };
+  }
+
+  if (numIdade >= 60) {
+    return {
+      tipo: 'idoso',
+      label: 'Melhor Idade / Idoso',
+      faixa: '60+ anos',
+      icone: '🧓',
+      badgeCor: 'rgba(16, 185, 129, 0.15)',
+      badgeBorder: 'rgba(16, 185, 129, 0.35)',
+      badgeTexto: '#34d399'
+    };
+  }
+
+  return {
+    tipo: 'adulto',
+    label: 'Adulto',
+    faixa: '18 a 59 anos',
+    icone: '🧑',
+    badgeCor: 'rgba(59, 130, 246, 0.15)',
+    badgeBorder: 'rgba(59, 130, 246, 0.3)',
+    badgeTexto: '#60a5fa'
+  };
 }
 
 export function calcularIMC(pesoKg, alturaCmOrM) {

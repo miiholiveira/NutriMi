@@ -74,7 +74,7 @@ export default function Login({ onSuccess }) {
         return;
       }
 
-      onSuccess(result.data?.session ?? result.data);
+      onSuccess(result.data);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Login error:', err);

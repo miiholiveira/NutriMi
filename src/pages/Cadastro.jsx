@@ -105,7 +105,7 @@ export default function Cadastro({ onSuccess }) {
         // Falha silenciosa — o cadastro no Auth já teve sucesso
       }
 
-      onSuccess(result.data?.session ?? result.data);
+      onSuccess(result.data);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Signup error:', err);

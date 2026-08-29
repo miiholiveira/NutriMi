@@ -37,31 +37,83 @@ function PublicGuard({ session, loading, children }) {
 
 export default function App() {
   const navigate = useNavigate();
-  const [session, setSession] = useState(null);
-  const [nutricionista, setNutricionista] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  // Inicialização síncrona com persistência local para manter o login após recarregar a página (F5)
+  const [session, setSession] = useState(() => {
+    try {
+      const cached = localStorage.getItem('nutrimi_session');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [nutricionista, setNutricionista] = useState(() => {
+    try {
+      const cached = localStorage.getItem('nutrimi_nutricionista');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [loading, setLoading] = useState(() => {
+    // Se já temos a sessão em cache, não bloqueia a renderização com o spinner
+    return !localStorage.getItem('nutrimi_session');
+  });
 
   async function checkSession() {
     try {
       const result = await authClient.getSession();
-      const currentSession = result?.data?.session || null;
-      setSession(currentSession);
-      
-      if (currentSession?.user?.email) {
-        let nut = await getNutricionistaByEmail(currentSession.user.email);
+      const apiSession = result?.data?.session || result?.data || null;
+      const apiUser = result?.data?.user || result?.data?.session?.user || null;
+      const email = apiUser?.email || apiSession?.user?.email;
+
+      if (apiSession && email) {
+        setSession(apiSession);
+        localStorage.setItem('nutrimi_session', JSON.stringify(apiSession));
+
+        let nut = await getNutricionistaByEmail(email);
         if (!nut) {
-          const nome = currentSession.user.name || currentSession.user.email.split('@')[0];
-          await saveNutricionista(nome, currentSession.user.email);
-          nut = await getNutricionistaByEmail(currentSession.user.email);
+          const nome = apiUser?.name || email.split('@')[0];
+          await saveNutricionista(nome, email);
+          nut = await getNutricionistaByEmail(email);
         }
-        setNutricionista(nut);
+        if (nut) {
+          setNutricionista(nut);
+          localStorage.setItem('nutrimi_nutricionista', JSON.stringify(nut));
+        }
       } else {
-        setNutricionista(null);
+        // Se a API remota não retornou sessão válida, verifica se temos o cache local
+        const cachedStr = localStorage.getItem('nutrimi_session');
+        if (!cachedStr) {
+          setSession(null);
+          setNutricionista(null);
+        } else {
+          // Mantém a sessão ativa a partir do cache e restaura o nutricionista se necessário
+          try {
+            const cachedObj = JSON.parse(cachedStr);
+            const cachedEmail = cachedObj?.user?.email || cachedObj?.email;
+            if (cachedEmail && !nutricionista) {
+              const nut = await getNutricionistaByEmail(cachedEmail);
+              if (nut) {
+                setNutricionista(nut);
+                localStorage.setItem('nutrimi_nutricionista', JSON.stringify(nut));
+              }
+            }
+          } catch (e) {
+            console.warn('Erro ao restaurar cache local:', e);
+          }
+        }
       }
     } catch (err) {
-      console.error(err);
-      setSession(null);
-      setNutricionista(null);
+      console.warn('Verificação de sessão remota:', err);
+      // Se houver erro de rede ou CORS, mantém o cache local do usuário sem deslogar
+      const cached = localStorage.getItem('nutrimi_session');
+      if (!cached) {
+        setSession(null);
+        setNutricionista(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -74,16 +126,23 @@ export default function App() {
   async function handleAuthSuccess(sessionData) {
     setLoading(true);
     const userSession = sessionData?.session || sessionData;
+    const userObj = sessionData?.user || sessionData?.session?.user || userSession?.user || (typeof sessionData === 'object' ? sessionData : null);
+    const email = userObj?.email || userSession?.email;
+
     setSession(userSession);
-    
-    if (userSession?.user?.email) {
-      let nut = await getNutricionistaByEmail(userSession.user.email);
+    localStorage.setItem('nutrimi_session', JSON.stringify(userSession));
+
+    if (email) {
+      let nut = await getNutricionistaByEmail(email);
       if (!nut) {
-        const nome = userSession.user.name || userSession.user.email.split('@')[0];
-        await saveNutricionista(nome, userSession.user.email);
-        nut = await getNutricionistaByEmail(userSession.user.email);
+        const nome = userObj?.name || email.split('@')[0];
+        await saveNutricionista(nome, email);
+        nut = await getNutricionistaByEmail(email);
       }
-      setNutricionista(nut);
+      if (nut) {
+        setNutricionista(nut);
+        localStorage.setItem('nutrimi_nutricionista', JSON.stringify(nut));
+      }
     }
     setLoading(false);
     navigate('/dashboard', { replace: true });
@@ -96,6 +155,8 @@ export default function App() {
     } catch (err) {
       console.warn(err);
     } finally {
+      localStorage.removeItem('nutrimi_session');
+      localStorage.removeItem('nutrimi_nutricionista');
       setSession(null);
       setNutricionista(null);
       setLoading(false);
